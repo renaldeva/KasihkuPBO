@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.DataFormats;
 
 
 namespace KasihkuPBO
@@ -21,7 +22,7 @@ namespace KasihkuPBO
 
         private void LoginUsername_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void LoginPassword_TextChanged(object sender, EventArgs e)
@@ -40,22 +41,37 @@ namespace KasihkuPBO
                 using (var conn = new NpgsqlConnection(connString))
                 {
                     conn.Open();
-                    string sql = "SELECT COUNT(*) FROM login WHERE username = @user AND kata_sandi = @pass";
+                    string sql = "SELECT role_job FROM login WHERE username = @user AND kata_sandi = @pass";
                     using (var cmd = new NpgsqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("user", usernameInput);
                         cmd.Parameters.AddWithValue("pass", passwordInput);
 
-                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+                        var roleObj = cmd.ExecuteScalar();
 
-                        if (count > 0)
+                        if (roleObj != null)
                         {
-                            MessageBox.Show("Login berhasil!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            // TODO: buka form selanjutnya
-                            Form2 form2 = new Form2(LoginUsername.Text);
-                            form2.Show();
+                            string role = roleObj.ToString().ToLower();
 
-                            this.Hide(); // Sembunyikan Form1 (form login)
+                            MessageBox.Show("Login berhasil sebagai " + role, "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            if (role == "admin")
+                            {
+                                Form2 formAdmin = new Form2(LoginUsername.Text); // Form untuk admin
+                                formAdmin.Show();
+                            }
+                            else if (role == "kasir")
+                            {
+                                Form3 formKasir = new Form3(LoginUsername.Text); // Form untuk kasir
+                                formKasir.Show();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Role tidak dikenali.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
+                            }
+
+                            this.Hide(); // Sembunyikan form login
                         }
                         else
                         {
@@ -67,8 +83,8 @@ namespace KasihkuPBO
             catch (Exception ex)
             {
                 MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+
             }
         }
-
     }
 }
