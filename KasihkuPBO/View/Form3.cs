@@ -29,5 +29,12 @@ namespace KasihkuPBO
         {
 
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 loginForm = new Form1();
+            loginForm.Show();
+        }
     }
 }

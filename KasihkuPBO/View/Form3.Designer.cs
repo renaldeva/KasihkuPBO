@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form3));
             label1 = new Label();
+            button1 = new Button();
             SuspendLayout();
             // 
             // label1
@@ -45,12 +46,27 @@
             label1.Text = "label1";
             label1.Click += label1_Click;
             // 
+            // button1
+            // 
+            button1.BackColor = Color.Red;
+            button1.FlatStyle = FlatStyle.Flat;
+            button1.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button1.ForeColor = Color.White;
+            button1.Location = new Point(100, 899);
+            button1.Name = "button1";
+            button1.Size = new Size(170, 54);
+            button1.TabIndex = 2;
+            button1.Text = "LOGOUT";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
+            // 
             // Form3
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1904, 1041);
+            Controls.Add(button1);
             Controls.Add(label1);
             Name = "Form3";
             Text = "Form3";
@@ -62,5 +78,6 @@
         #endregion
 
         private Label label1;
+        private Button button1;
     }
 }

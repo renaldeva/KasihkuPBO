@@ -22,5 +22,12 @@ namespace KasihkuPBO
         {
 
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide(); // Sembunyikan form admin
+            Form1 loginForm = new Form1(); // Kembali ke login
+            loginForm.Show();
+        }
     }
 }
