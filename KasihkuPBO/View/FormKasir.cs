@@ -12,9 +12,9 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace KasihkuPBO
 {
-    public partial class Form3 : Form
+    public partial class FormKasir : Form
     {
-        public Form3(string username)
+        public FormKasir(string username)
         {
             InitializeComponent();
             label1.Text = "Selamat datang di aplikasi Kasihku," + " " + username;
@@ -33,7 +33,7 @@ namespace KasihkuPBO
         private void button1_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Form1 loginForm = new Form1();
+            FormLogin loginForm = new FormLogin();
             loginForm.Show();
         }
     }

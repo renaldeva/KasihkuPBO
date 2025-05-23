@@ -15,11 +15,11 @@ using static System.Windows.Forms.DataFormats;
 
 namespace KasihkuPBO
 {
-    public partial class Form1 : Form
+    public partial class FormLogin : Form
     {
         private readonly AuthController authController;
 
-        public Form1()
+        public FormLogin()
         {
             InitializeComponent();
             authController = new AuthController();
@@ -53,12 +53,12 @@ namespace KasihkuPBO
 
                     if (role.ToLower() == "admin")
                     {
-                        Form2 formAdmin = new Form2(user.Username);
+                        FormAdmin formAdmin = new FormAdmin(user.Username);
                         formAdmin.Show();
                     }
                     else if (role.ToLower() == "kasir")
                     {
-                        Form3 formKasir = new Form3(user.Username);
+                        FormKasir formKasir = new FormKasir(user.Username);
                         formKasir.Show();
                     }
                     else
@@ -78,6 +78,11 @@ namespace KasihkuPBO
             {
                 MessageBox.Show("Terjadi kesalahan: " + ex.Message);
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace KasihkuPBO
 {
-    partial class Form2
+    partial class FormKasir
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormKasir));
             label1 = new Label();
             button1 = new Button();
             SuspendLayout();
@@ -39,11 +39,11 @@
             label1.BackColor = Color.Transparent;
             label1.Font = new Font("Segoe UI", 36F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label1.ForeColor = Color.DarkGreen;
-            label1.Location = new Point(450, 177);
+            label1.Location = new Point(450, 161);
             label1.Name = "label1";
-            label1.Size = new Size(383, 65);
+            label1.Size = new Size(166, 65);
             label1.TabIndex = 0;
-            label1.Text = "Selamat datang";
+            label1.Text = "label1";
             label1.Click += label1_Click;
             // 
             // button1
@@ -52,15 +52,15 @@
             button1.FlatStyle = FlatStyle.Flat;
             button1.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button1.ForeColor = Color.White;
-            button1.Location = new Point(113, 889);
+            button1.Location = new Point(100, 899);
             button1.Name = "button1";
             button1.Size = new Size(170, 54);
-            button1.TabIndex = 1;
+            button1.TabIndex = 2;
             button1.Text = "LOGOUT";
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
-            // Form2
+            // Form3
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -68,8 +68,9 @@
             ClientSize = new Size(1904, 1041);
             Controls.Add(button1);
             Controls.Add(label1);
-            Name = "Form2";
-            Text = "Form2";
+            Name = "Form3";
+            Text = "Form3";
+            Load += Form3_Load;
             ResumeLayout(false);
             PerformLayout();
         }

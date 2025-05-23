@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace KasihkuPBO
 {
-    public partial class Form2 : Form
+    public partial class FormAdmin : Form
     {
-        public Form2(string username)
+        public FormAdmin(string username)
         {
             InitializeComponent();
             label1.Text = "Selamat datang di aplikasi Kasihku," + " " + username;
@@ -26,7 +26,7 @@ namespace KasihkuPBO
         private void button1_Click(object sender, EventArgs e)
         {
             this.Hide(); // Sembunyikan form admin
-            Form1 loginForm = new Form1(); // Kembali ke login
+            FormLogin loginForm = new FormLogin(); // Kembali ke login
             loginForm.Show();
         }
     }
