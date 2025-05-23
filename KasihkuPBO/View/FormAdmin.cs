@@ -29,5 +29,10 @@ namespace KasihkuPBO
             FormLogin loginForm = new FormLogin(); // Kembali ke login
             loginForm.Show();
         }
+
+        private void FormAdmin_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

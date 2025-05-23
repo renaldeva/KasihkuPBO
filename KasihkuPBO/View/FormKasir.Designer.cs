@@ -60,7 +60,7 @@
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
-            // Form3
+            // FormKasir
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -68,7 +68,7 @@
             ClientSize = new Size(1904, 1041);
             Controls.Add(button1);
             Controls.Add(label1);
-            Name = "Form3";
+            Name = "FormKasir";
             Text = "Form3";
             Load += Form3_Load;
             ResumeLayout(false);

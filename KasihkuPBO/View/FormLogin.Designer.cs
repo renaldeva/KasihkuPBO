@@ -48,23 +48,27 @@
             // 
             // LoginUsername
             // 
+            LoginUsername.BackColor = SystemColors.Window;
+            LoginUsername.BorderStyle = BorderStyle.None;
+            LoginUsername.Cursor = Cursors.Hand;
             LoginUsername.Font = new Font("Segoe UI", 24F, FontStyle.Regular, GraphicsUnit.Point, 0);
             LoginUsername.Location = new Point(576, 456);
             LoginUsername.Name = "LoginUsername";
-            LoginUsername.Size = new Size(747, 50);
+            LoginUsername.Size = new Size(747, 43);
             LoginUsername.TabIndex = 5;
             LoginUsername.TextChanged += LoginUsername_TextChanged;
             // 
             // LoginPassword
             // 
+            LoginPassword.BorderStyle = BorderStyle.None;
             LoginPassword.Font = new Font("Segoe UI", 24F, FontStyle.Regular, GraphicsUnit.Point, 0);
             LoginPassword.Location = new Point(576, 636);
             LoginPassword.Name = "LoginPassword";
-            LoginPassword.Size = new Size(747, 50);
+            LoginPassword.Size = new Size(747, 43);
             LoginPassword.TabIndex = 6;
             LoginPassword.TextChanged += LoginPassword_TextChanged;
             // 
-            // Form1
+            // FormLogin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -74,7 +78,7 @@
             Controls.Add(LoginUsername);
             Controls.Add(button1);
             Margin = new Padding(2);
-            Name = "Form1";
+            Name = "FormLogin";
             Text = "Form1";
             Load += Form1_Load;
             ResumeLayout(false);

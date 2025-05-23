@@ -60,7 +60,7 @@
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
-            // Form2
+            // FormAdmin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -68,8 +68,9 @@
             ClientSize = new Size(1904, 1041);
             Controls.Add(button1);
             Controls.Add(label1);
-            Name = "Form2";
+            Name = "FormAdmin";
             Text = "Form2";
+            Load += FormAdmin_Load;
             ResumeLayout(false);
             PerformLayout();
         }
