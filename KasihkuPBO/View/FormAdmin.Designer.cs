@@ -31,6 +31,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormAdmin));
             label1 = new Label();
             button1 = new Button();
+            btnAdminProduk = new Button();
+            btnAdminTransaksi = new Button();
+            btnAdminRiwayat = new Button();
+            btnAdminManajemen = new Button();
             SuspendLayout();
             // 
             // label1
@@ -60,12 +64,69 @@
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
+            // btnAdminProduk
+            // 
+            btnAdminProduk.BackColor = Color.Transparent;
+            btnAdminProduk.BackgroundImageLayout = ImageLayout.Zoom;
+            btnAdminProduk.ForeColor = Color.Transparent;
+            btnAdminProduk.Image = (Image)resources.GetObject("btnAdminProduk.Image");
+            btnAdminProduk.Location = new Point(12, 279);
+            btnAdminProduk.Name = "btnAdminProduk";
+            btnAdminProduk.Size = new Size(378, 67);
+            btnAdminProduk.TabIndex = 3;
+            btnAdminProduk.UseVisualStyleBackColor = false;
+            btnAdminProduk.Click += btnAdminProduk_Click;
+            // 
+            // btnAdminTransaksi
+            // 
+            btnAdminTransaksi.BackColor = Color.Transparent;
+            btnAdminTransaksi.ForeColor = Color.Transparent;
+            btnAdminTransaksi.Image = (Image)resources.GetObject("btnAdminTransaksi.Image");
+            btnAdminTransaksi.Location = new Point(12, 346);
+            btnAdminTransaksi.Name = "btnAdminTransaksi";
+            btnAdminTransaksi.Size = new Size(378, 77);
+            btnAdminTransaksi.TabIndex = 4;
+            btnAdminTransaksi.UseVisualStyleBackColor = false;
+            btnAdminTransaksi.Click += btnAdminTransaksi_Click;
+            // 
+            // btnAdminRiwayat
+            // 
+            btnAdminRiwayat.BackColor = Color.Transparent;
+            btnAdminRiwayat.BackgroundImage = (Image)resources.GetObject("btnAdminRiwayat.BackgroundImage");
+            btnAdminRiwayat.BackgroundImageLayout = ImageLayout.Zoom;
+            btnAdminRiwayat.ForeColor = Color.Transparent;
+            btnAdminRiwayat.Image = (Image)resources.GetObject("btnAdminRiwayat.Image");
+            btnAdminRiwayat.Location = new Point(12, 423);
+            btnAdminRiwayat.Name = "btnAdminRiwayat";
+            btnAdminRiwayat.Size = new Size(378, 77);
+            btnAdminRiwayat.TabIndex = 5;
+            btnAdminRiwayat.UseVisualStyleBackColor = false;
+            btnAdminRiwayat.Click += btnAdminRiwayat_Click;
+            // 
+            // btnAdminManajemen
+            // 
+            btnAdminManajemen.BackColor = Color.Transparent;
+            btnAdminManajemen.BackgroundImage = (Image)resources.GetObject("btnAdminManajemen.BackgroundImage");
+            btnAdminManajemen.BackgroundImageLayout = ImageLayout.Zoom;
+            btnAdminManajemen.ForeColor = Color.Transparent;
+            btnAdminManajemen.Image = (Image)resources.GetObject("btnAdminManajemen.Image");
+            btnAdminManajemen.Location = new Point(12, 500);
+            btnAdminManajemen.Name = "btnAdminManajemen";
+            btnAdminManajemen.Size = new Size(378, 77);
+            btnAdminManajemen.TabIndex = 6;
+            btnAdminManajemen.UseVisualStyleBackColor = false;
+            btnAdminManajemen.Click += btnAdminManajemen_Click;
+            // 
             // FormAdmin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1904, 1041);
+            Controls.Add(btnAdminManajemen);
+            Controls.Add(btnAdminRiwayat);
+            Controls.Add(btnAdminTransaksi);
+            Controls.Add(btnAdminProduk);
             Controls.Add(button1);
             Controls.Add(label1);
             Name = "FormAdmin";
@@ -79,5 +140,9 @@
 
         private Label label1;
         private Button button1;
+        private Button btnAdminProduk;
+        private Button btnAdminTransaksi;
+        private Button btnAdminRiwayat;
+        private Button btnAdminManajemen;
     }
 }

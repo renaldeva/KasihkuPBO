@@ -25,12 +25,32 @@ namespace KasihkuPBO
 
         private void button1_Click(object sender, EventArgs e)
         {
-            this.Hide(); // Sembunyikan form admin
-            FormLogin loginForm = new FormLogin(); // Kembali ke login
+            this.Hide();
+            FormLogin loginForm = new FormLogin();
             loginForm.Show();
         }
 
         private void FormAdmin_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAdminProduk_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAdminTransaksi_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAdminRiwayat_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAdminManajemen_Click(object sender, EventArgs e)
         {
 
         }

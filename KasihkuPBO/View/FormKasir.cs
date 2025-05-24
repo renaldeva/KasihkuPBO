@@ -41,5 +41,20 @@ namespace KasihkuPBO
         {
 
         }
+
+        private void btnProdukKasir_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnTransaksiKasir_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRiwayatKasir_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

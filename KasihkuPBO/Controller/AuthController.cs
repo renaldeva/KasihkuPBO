@@ -6,7 +6,7 @@ namespace KasihkuPBO.Controller
 {
     public class AuthController
     {
-        private readonly string connString = "Host=localhost;Port=5432;Username=postgres;Password=Rafif0205,;Database=project;";
+        private readonly string connString = "Host=localhost;Port=5432;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
 
         public string Login(UserModel user)
         {

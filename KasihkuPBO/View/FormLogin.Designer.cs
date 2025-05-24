@@ -38,10 +38,12 @@
             // 
             button1.BackColor = Color.Transparent;
             button1.FlatStyle = FlatStyle.Flat;
+            button1.Font = new Font("Book Antiqua", 27.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button1.ForeColor = Color.Transparent;
-            button1.Location = new Point(614, 765);
+            button1.Image = (Image)resources.GetObject("button1.Image");
+            button1.Location = new Point(614, 767);
             button1.Name = "button1";
-            button1.Size = new Size(709, 88);
+            button1.Size = new Size(709, 90);
             button1.TabIndex = 1;
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;

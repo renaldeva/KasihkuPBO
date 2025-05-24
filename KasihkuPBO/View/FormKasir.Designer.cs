@@ -31,6 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormKasir));
             label1 = new Label();
             button1 = new Button();
+            btnRiwayatKasir = new Button();
+            btnProdukKasir = new Button();
+            btnTransaksiKasir = new Button();
             SuspendLayout();
             // 
             // label1
@@ -60,12 +63,49 @@
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
+            // btnRiwayatKasir
+            // 
+            btnRiwayatKasir.ForeColor = Color.Transparent;
+            btnRiwayatKasir.Image = (Image)resources.GetObject("btnRiwayatKasir.Image");
+            btnRiwayatKasir.Location = new Point(12, 424);
+            btnRiwayatKasir.Name = "btnRiwayatKasir";
+            btnRiwayatKasir.Size = new Size(372, 73);
+            btnRiwayatKasir.TabIndex = 5;
+            btnRiwayatKasir.UseVisualStyleBackColor = true;
+            btnRiwayatKasir.Click += btnRiwayatKasir_Click;
+            // 
+            // btnProdukKasir
+            // 
+            btnProdukKasir.BackColor = Color.Transparent;
+            btnProdukKasir.ForeColor = Color.Transparent;
+            btnProdukKasir.Image = (Image)resources.GetObject("btnProdukKasir.Image");
+            btnProdukKasir.Location = new Point(12, 280);
+            btnProdukKasir.Name = "btnProdukKasir";
+            btnProdukKasir.Size = new Size(372, 70);
+            btnProdukKasir.TabIndex = 6;
+            btnProdukKasir.UseVisualStyleBackColor = false;
+            btnProdukKasir.Click += btnProdukKasir_Click;
+            // 
+            // btnTransaksiKasir
+            // 
+            btnTransaksiKasir.ForeColor = Color.Transparent;
+            btnTransaksiKasir.Image = (Image)resources.GetObject("btnTransaksiKasir.Image");
+            btnTransaksiKasir.Location = new Point(12, 352);
+            btnTransaksiKasir.Name = "btnTransaksiKasir";
+            btnTransaksiKasir.Size = new Size(372, 70);
+            btnTransaksiKasir.TabIndex = 7;
+            btnTransaksiKasir.UseVisualStyleBackColor = true;
+            btnTransaksiKasir.Click += btnTransaksiKasir_Click;
+            // 
             // FormKasir
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1904, 1041);
+            Controls.Add(btnTransaksiKasir);
+            Controls.Add(btnProdukKasir);
+            Controls.Add(btnRiwayatKasir);
             Controls.Add(button1);
             Controls.Add(label1);
             Name = "FormKasir";
@@ -79,5 +119,8 @@
 
         private Label label1;
         private Button button1;
+        private Button btnRiwayatKasir;
+        private Button btnProdukKasir;
+        private Button btnTransaksiKasir;
     }
 }
