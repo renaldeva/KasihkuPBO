@@ -1,4 +1,5 @@
-﻿namespace KasihkuPBO
+﻿
+namespace KasihkuPBO
 {
     partial class FormAdmin
     {
