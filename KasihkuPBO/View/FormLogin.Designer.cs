@@ -32,6 +32,7 @@
             button1 = new Button();
             LoginUsername = new TextBox();
             LoginPassword = new TextBox();
+            checkBox1 = new CheckBox();
             SuspendLayout();
             // 
             // button1
@@ -70,12 +71,25 @@
             LoginPassword.TabIndex = 6;
             LoginPassword.TextChanged += LoginPassword_TextChanged;
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.BackColor = Color.Transparent;
+            checkBox1.Location = new Point(1278, 738);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(134, 19);
+            checkBox1.TabIndex = 7;
+            checkBox1.Text = "Tampilkan Password";
+            checkBox1.UseVisualStyleBackColor = false;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            // 
             // FormLogin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             ClientSize = new Size(1904, 1041);
+            Controls.Add(checkBox1);
             Controls.Add(LoginPassword);
             Controls.Add(LoginUsername);
             Controls.Add(button1);
@@ -93,5 +107,6 @@
         private PictureBox pictureBox3;
         private TextBox LoginUsername;
         private TextBox LoginPassword;
+        private CheckBox checkBox1;
     }
 }

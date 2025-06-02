@@ -65,20 +65,21 @@
             // 
             // btnRiwayatKasir
             // 
+            btnRiwayatKasir.BackColor = Color.Transparent;
+            btnRiwayatKasir.FlatStyle = FlatStyle.Popup;
             btnRiwayatKasir.ForeColor = Color.Transparent;
-            btnRiwayatKasir.Image = (Image)resources.GetObject("btnRiwayatKasir.Image");
             btnRiwayatKasir.Location = new Point(12, 424);
             btnRiwayatKasir.Name = "btnRiwayatKasir";
             btnRiwayatKasir.Size = new Size(372, 73);
             btnRiwayatKasir.TabIndex = 5;
-            btnRiwayatKasir.UseVisualStyleBackColor = true;
+            btnRiwayatKasir.UseVisualStyleBackColor = false;
             btnRiwayatKasir.Click += btnRiwayatKasir_Click;
             // 
             // btnProdukKasir
             // 
             btnProdukKasir.BackColor = Color.Transparent;
+            btnProdukKasir.FlatStyle = FlatStyle.Popup;
             btnProdukKasir.ForeColor = Color.Transparent;
-            btnProdukKasir.Image = (Image)resources.GetObject("btnProdukKasir.Image");
             btnProdukKasir.Location = new Point(12, 280);
             btnProdukKasir.Name = "btnProdukKasir";
             btnProdukKasir.Size = new Size(372, 70);
@@ -88,13 +89,14 @@
             // 
             // btnTransaksiKasir
             // 
+            btnTransaksiKasir.BackColor = Color.Transparent;
+            btnTransaksiKasir.FlatStyle = FlatStyle.Popup;
             btnTransaksiKasir.ForeColor = Color.Transparent;
-            btnTransaksiKasir.Image = (Image)resources.GetObject("btnTransaksiKasir.Image");
             btnTransaksiKasir.Location = new Point(12, 352);
             btnTransaksiKasir.Name = "btnTransaksiKasir";
             btnTransaksiKasir.Size = new Size(372, 70);
             btnTransaksiKasir.TabIndex = 7;
-            btnTransaksiKasir.UseVisualStyleBackColor = true;
+            btnTransaksiKasir.UseVisualStyleBackColor = false;
             btnTransaksiKasir.Click += btnTransaksiKasir_Click;
             // 
             // FormKasir

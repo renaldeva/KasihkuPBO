@@ -82,7 +82,12 @@ namespace KasihkuPBO
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            LoginPassword.UseSystemPasswordChar = true;
+        }
 
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            LoginPassword.UseSystemPasswordChar = !checkBox1.Checked!;
         }
     }
 }

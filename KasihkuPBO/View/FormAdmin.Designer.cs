@@ -69,8 +69,8 @@ namespace KasihkuPBO
             // 
             btnAdminProduk.BackColor = Color.Transparent;
             btnAdminProduk.BackgroundImageLayout = ImageLayout.Zoom;
+            btnAdminProduk.FlatStyle = FlatStyle.Popup;
             btnAdminProduk.ForeColor = Color.Transparent;
-            btnAdminProduk.Image = (Image)resources.GetObject("btnAdminProduk.Image");
             btnAdminProduk.Location = new Point(12, 279);
             btnAdminProduk.Name = "btnAdminProduk";
             btnAdminProduk.Size = new Size(378, 67);
@@ -81,8 +81,8 @@ namespace KasihkuPBO
             // btnAdminTransaksi
             // 
             btnAdminTransaksi.BackColor = Color.Transparent;
+            btnAdminTransaksi.FlatStyle = FlatStyle.Popup;
             btnAdminTransaksi.ForeColor = Color.Transparent;
-            btnAdminTransaksi.Image = (Image)resources.GetObject("btnAdminTransaksi.Image");
             btnAdminTransaksi.Location = new Point(12, 346);
             btnAdminTransaksi.Name = "btnAdminTransaksi";
             btnAdminTransaksi.Size = new Size(378, 77);
@@ -95,8 +95,8 @@ namespace KasihkuPBO
             btnAdminRiwayat.BackColor = Color.Transparent;
             btnAdminRiwayat.BackgroundImage = (Image)resources.GetObject("btnAdminRiwayat.BackgroundImage");
             btnAdminRiwayat.BackgroundImageLayout = ImageLayout.Zoom;
+            btnAdminRiwayat.FlatStyle = FlatStyle.Popup;
             btnAdminRiwayat.ForeColor = Color.Transparent;
-            btnAdminRiwayat.Image = (Image)resources.GetObject("btnAdminRiwayat.Image");
             btnAdminRiwayat.Location = new Point(12, 423);
             btnAdminRiwayat.Name = "btnAdminRiwayat";
             btnAdminRiwayat.Size = new Size(378, 77);
@@ -109,8 +109,8 @@ namespace KasihkuPBO
             btnAdminManajemen.BackColor = Color.Transparent;
             btnAdminManajemen.BackgroundImage = (Image)resources.GetObject("btnAdminManajemen.BackgroundImage");
             btnAdminManajemen.BackgroundImageLayout = ImageLayout.Zoom;
+            btnAdminManajemen.FlatStyle = FlatStyle.Popup;
             btnAdminManajemen.ForeColor = Color.Transparent;
-            btnAdminManajemen.Image = (Image)resources.GetObject("btnAdminManajemen.Image");
             btnAdminManajemen.Location = new Point(12, 500);
             btnAdminManajemen.Name = "btnAdminManajemen";
             btnAdminManajemen.Size = new Size(378, 77);
