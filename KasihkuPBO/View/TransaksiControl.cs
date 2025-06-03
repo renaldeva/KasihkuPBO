@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
+using Npgsql;
 
 namespace KasihkuPBO.View
 {
@@ -16,8 +18,10 @@ namespace KasihkuPBO.View
         public event Action KembaliClicked;
 
         private decimal total = 0;
-        // key = id produk, value = tuple (nama, harga, jumlah)
         private Dictionary<int, (string nama, decimal harga, int jumlah)> keranjang = new();
+
+        private string connectionString = "Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
+        private readonly object idTransaksi;
 
         public TransaksiControl()
         {
@@ -39,7 +43,7 @@ namespace KasihkuPBO.View
                 AllowUserToAddRows = false
             };
 
-            dataGridViewTransaksi.Columns.Add("id", "ID Produk");
+            dataGridViewTransaksi.Columns.Add("id_produk", "ID Produk");
             dataGridViewTransaksi.Columns.Add("nama", "Nama Produk");
             dataGridViewTransaksi.Columns.Add("qty", "Qty");
             dataGridViewTransaksi.Columns.Add("harga", "Harga Satuan");
@@ -137,24 +141,83 @@ namespace KasihkuPBO.View
                 return;
             }
 
-            string tanggal = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+            string tanggal = DateTime.Now.ToString("yyyy-MM-dd");
             string daftarProduk = "";
 
-            foreach (var item in keranjang)
+            using (var conn = new NpgsqlConnection(connectionString))
             {
-                daftarProduk += $"{item.Value.nama} x{item.Value.jumlah}, ";
+                conn.Open();
+                using (var trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+
+                        int idTransaksi;
+
+                        using (var cmd = new NpgsqlCommand("INSERT INTO transaksi (tanggal, total) VALUES (@tanggal, @total) RETURNING id_transaksi", conn))
+                        {
+                            cmd.Parameters.AddWithValue("@tanggal", DateTime.Now);
+                            cmd.Parameters.AddWithValue("@total", total);
+                            cmd.Transaction = trans; // ← penting!
+
+                            idTransaksi = Convert.ToInt32(cmd.ExecuteScalar());
+                        }
+
+                        foreach (var item in keranjang)
+                        {
+                            // Simpan detail transaksi
+                            string insertDetail = @"
+                            INSERT INTO detail_transaksi 
+                            (id_transaksi, id_produk, nama_produk, jumlah, harga, subtotal)
+                            VALUES 
+                            (@id_transaksi, @id_produk, @nama_produk, @jumlah, @harga, @subtotal)";
+
+                            using (var cmdDetail = new NpgsqlCommand(insertDetail, conn))
+                            {
+                                cmdDetail.Parameters.AddWithValue("@id_transaksi", idTransaksi);
+                                cmdDetail.Parameters.AddWithValue("@id_produk", item.Key);
+                                cmdDetail.Parameters.AddWithValue("@nama_produk", item.Value.nama);
+                                cmdDetail.Parameters.AddWithValue("@jumlah", item.Value.jumlah);
+                                cmdDetail.Parameters.AddWithValue("@harga", item.Value.harga);
+                                cmdDetail.Parameters.AddWithValue("@subtotal", item.Value.harga * item.Value.jumlah);
+                                cmdDetail.Transaction = trans;
+
+                                cmdDetail.ExecuteNonQuery();
+                            }
+
+                            // Update stok produk
+                            string updateStok = "UPDATE produk SET stok = stok - @jumlah WHERE id_produk = @id_produk";
+                            using (var cmdUpdate = new NpgsqlCommand(updateStok, conn))
+                            {
+                                cmdUpdate.Parameters.AddWithValue("@jumlah", item.Value.jumlah);
+                                cmdUpdate.Parameters.AddWithValue("@id_produk", item.Key);
+                                cmdUpdate.Transaction = trans;
+
+                                cmdUpdate.ExecuteNonQuery();
+                            }
+
+                            daftarProduk += $"{item.Value.nama} x{item.Value.jumlah}, ";
+                        }
+
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        MessageBox.Show("Gagal menyimpan transaksi: " + ex.Message);
+                        return;
+                    }
+                }
             }
 
             daftarProduk = daftarProduk.TrimEnd(',', ' ');
-
-            // Tambahkan ke panel riwayat transaksi jika sudah diset
             RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, total);
-
             MessageBox.Show("Transaksi berhasil disimpan!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             keranjang.Clear();
             RenderKeranjang();
         }
+
 
         private void BtnKembali_Click(object sender, EventArgs e)
         {

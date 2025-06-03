@@ -10,7 +10,7 @@ namespace KasihkuPBO.View
 {
     public partial class ProdukKasirControl : UserControl
     {
-        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=Dev@211104;Database=KASIHKU";
+        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
 
         private Panel panelProduk, panelRekomendasi;
         private TextBox txtSearch;
@@ -140,20 +140,21 @@ namespace KasihkuPBO.View
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 AllowUserToAddRows = false,
                 ReadOnly = true,
-                RowTemplate = { Height = 100 }
+                RowTemplate = { Height = 100 },
+                RowHeadersVisible = false
             };
 
+            grid.Columns.Add("no", "No"); 
             grid.Columns.Add("id_produk", "ID");
+            grid.Columns["id_produk"].Visible = false;
             grid.Columns.Add("nama_produk", "Nama Produk");
             grid.Columns.Add("stok", "Stok");
             grid.Columns.Add("deskripsi", "Deskripsi");
 
-            var imgCol = new DataGridViewImageColumn
-            {
-                Name = "gambar",
-                HeaderText = "Gambar",
-                ImageLayout = DataGridViewImageCellLayout.Zoom
-            };
+            var imgCol = new DataGridViewImageColumn();
+            imgCol.Name = "Gambar";
+            imgCol.HeaderText = "Gambar";
+            imgCol.ImageLayout = DataGridViewImageCellLayout.Zoom; 
             grid.Columns.Add(imgCol);
 
             grid.Columns.Add("harga", "Harga");
@@ -164,6 +165,14 @@ namespace KasihkuPBO.View
             grid.Columns.Add(new DataGridViewButtonColumn { Name = "kurang", HeaderText = "Kurang", Text = "-", UseColumnTextForButtonValue = true });
 
             grid.CellClick += DataGridViewProduk_CellClick;
+
+            grid.DataError += (s, e) =>
+            {
+                MessageBox.Show("Terjadi kesalahan saat menampilkan data produk:\n\n" + e.Exception.Message,
+                    "Kesalahan Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.ThrowException = false;
+            };
+
             return grid;
         }
 
@@ -180,25 +189,27 @@ namespace KasihkuPBO.View
             {
                 conn.Open();
                 var query = @"
-                    SELECT p.id_produk, p.nama_produk, p.stok, p.deskripsi, p.gambar, p.harga, k.nama_kategori
-                    FROM produk p
-                    JOIN kategori_produk k ON p.id_kategori = k.id_kategori
-                    WHERE LOWER(p.nama_produk) LIKE @keyword
-                    ORDER BY p.id_produk";
+            SELECT p.id_produk, p.nama_produk, p.stok, p.deskripsi, p.gambar, p.harga, k.nama_kategori
+            FROM produk p
+            JOIN kategori_produk k ON p.id_kategori = k.id_kategori
+            WHERE LOWER(p.nama_produk) LIKE @keyword
+            ORDER BY p.id_produk";
                 var cmd = new NpgsqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("keyword", $"%{keyword.ToLower()}%");
 
                 using (var reader = cmd.ExecuteReader())
                 {
+                    int no = 1;
                     while (reader.Read())
                     {
-                        AddProdukRow(dataGridViewProduk, reader);
+                        AddProdukRow(dataGridViewProduk, reader, no);
+                        no++;
                     }
                 }
             }
         }
 
-        private void AddProdukRow(DataGridView grid, NpgsqlDataReader reader)
+        private void AddProdukRow(DataGridView grid, NpgsqlDataReader reader, int no)
         {
             int id = reader.GetInt32(0);
             string nama = reader.GetString(1);
@@ -212,10 +223,12 @@ namespace KasihkuPBO.View
             if (gambarBytes != null)
             {
                 using (MemoryStream ms = new MemoryStream(gambarBytes))
+                {
                     img = Image.FromStream(ms);
+                }
             }
 
-            grid.Rows.Add(id, nama, stok, deskripsi, img, harga.ToString("N0"), kategori, 0);
+            grid.Rows.Add(no, id, nama, stok, deskripsi, img, harga.ToString("N0"), kategori, 0);
         }
 
         private void DataGridViewProduk_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -248,6 +261,7 @@ namespace KasihkuPBO.View
                     ProdukDikurangkan?.Invoke(id);
                 }
             }
+
         }
 
         private void BtnRekomendasi_Click_ShowPanel(object sender, EventArgs e)
