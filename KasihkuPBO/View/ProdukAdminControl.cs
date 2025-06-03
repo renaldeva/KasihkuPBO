@@ -9,7 +9,8 @@ namespace KasihkuPBO.View
 {
     public partial class ProdukAdminControl : UserControl
     {
-        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=putriadelss2401;Database=pbo projek";
+
+        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=Dev@211104;Database=KASIHKU";
 
         private Panel panelGrid;
         private Panel panelFormInput;
@@ -52,7 +53,7 @@ namespace KasihkuPBO.View
         {
             // Panel Grid
             panelGrid = new Panel() { Dock = DockStyle.Fill };
-            panelGrid.BackgroundImage = Image.FromFile(@"D:\Downloads\MJ.png");
+            panelGrid.BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\MJ.png");
             panelGrid.BackgroundImageLayout = ImageLayout.Stretch;
             this.Controls.Add(panelGrid);
 
@@ -111,7 +112,7 @@ namespace KasihkuPBO.View
 
             // Panel Form Input
             panelFormInput = new Panel() { Dock = DockStyle.Fill, Visible = false };
-            panelFormInput.BackgroundImage = Image.FromFile(@"D:\Downloads\MJ.png");
+            panelFormInput.BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\MJ.png");
             panelFormInput.BackgroundImageLayout = ImageLayout.Stretch;
             this.Controls.Add(panelFormInput);
 

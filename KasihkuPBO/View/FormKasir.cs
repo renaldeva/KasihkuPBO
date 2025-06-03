@@ -1,34 +1,116 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+﻿using KasihkuPBO.View;
+using System;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace KasihkuPBO
 {
     public partial class FormKasir : Form
     {
+        private ProdukKasirControl produkKasirControl;
+        private TransaksiControl transaksiControl;
+        private RiwayatTransaksiControl riwayatControl;
+
         public FormKasir(string username)
         {
             InitializeComponent();
-            label1.Text = "Selamat datang di aplikasi Kasihku," + " " + username;
+
+            label1.Text = "Selamat datang di aplikasi Kasihku, " + username;
+
+            // Inisialisasi UserControl
+            produkKasirControl = new ProdukKasirControl();
+            produkKasirControl.Dock = DockStyle.Fill;
+            produkKasirControl.ProdukDitambahkan += ProdukDitambahkanHandler;
+            produkKasirControl.ProdukDikurangkan += ProdukDikurangkanHandler;
+
+            transaksiControl = new TransaksiControl();
+            transaksiControl.Dock = DockStyle.Fill;
+
+            riwayatControl = new RiwayatTransaksiControl();
+            riwayatControl.Dock = DockStyle.Fill;
+
+            transaksiControl.RiwayatPanel = riwayatControl;
+
+            // Tambahkan langsung ke Form (this.Controls)
+            this.Controls.Add(produkKasirControl);
+            this.Controls.Add(transaksiControl);
+            this.Controls.Add(riwayatControl);
+
+            // Atur visibilitas awal: tampilkan produk saja
+            produkKasirControl.Visible = true;
+            transaksiControl.Visible = false;
+            riwayatControl.Visible = false;
+
+            produkKasirControl.SembunyikanProduk();
+
+            // Navigasi internal dari produk ke transaksi
+            produkKasirControl.NavigasiKeTransaksi += () =>
+            {
+                produkKasirControl.SembunyikanProduk();
+                transaksiControl.Tampilkan();
+            };
+
+            riwayatControl.KembaliClicked += () =>
+            {
+                // Event tombol kembali riwayat supaya sembunyikan semua user control
+                    produkKasirControl.Visible = false;
+                    transaksiControl.Visible = false;
+                    riwayatControl.Visible = false;
+            };
         }
 
-        private void Form3_Load(object sender, EventArgs e)
+        private void ShowProdukControl()
         {
+            produkKasirControl.Visible = true;
+            transaksiControl.Visible = false;
+            riwayatControl.Visible = false;
 
+            produkKasirControl.TampilkanProduk();
+            produkKasirControl.BringToFront();
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void ShowTransaksiControl()
         {
+            produkKasirControl.Visible = false;
+            transaksiControl.Visible = true;
+            riwayatControl.Visible = false;
 
+            transaksiControl.BringToFront();
         }
+
+        private void ShowRiwayatControl()
+        {
+            produkKasirControl.Visible = false;
+            transaksiControl.Visible = false;
+            riwayatControl.Visible = true;
+
+            riwayatControl.BringToFront();
+        }
+
+        private void btnProdukKasir_Click(object sender, EventArgs e)
+        {
+            ShowProdukControl();
+        }
+
+        private void btnTransaksiKasir_Click(object sender, EventArgs e)
+        {
+            ShowTransaksiControl();
+        }
+
+        private void btnRiwayatKasir_Click(object sender, EventArgs e)
+        {
+            ShowRiwayatControl();
+        }
+
+        private void ProdukDitambahkanHandler(int id, string nama, decimal harga)
+        {
+            transaksiControl.TambahProduk(id, nama, harga);
+        }
+
+        private void ProdukDikurangkanHandler(int id)
+        {
+            transaksiControl.KurangiProduk(id);
+        }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -39,22 +121,17 @@ namespace KasihkuPBO
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            // Kosong, sesuai kode awal
         }
 
-        private void btnProdukKasir_Click(object sender, EventArgs e)
+        private void Form3_Load(object sender, EventArgs e)
         {
-
+            // Kosong, sesuai kode awal
         }
 
-        private void btnTransaksiKasir_Click(object sender, EventArgs e)
+        private void label1_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void btnRiwayatKasir_Click(object sender, EventArgs e)
-        {
-
+            // Kosong, sesuai kode awal
         }
     }
 }

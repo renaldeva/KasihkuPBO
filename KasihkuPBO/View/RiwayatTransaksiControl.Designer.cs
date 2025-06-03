@@ -1,7 +1,6 @@
-﻿
-namespace KasihkuPBO.View
+﻿namespace KasihkuPBO.View
 {
-    partial class ProdukKasirControl
+    partial class RiwayatTransaksiControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -31,19 +30,13 @@ namespace KasihkuPBO.View
         {
             SuspendLayout();
             // 
-            // ProdukKasirControl
+            // RiwayatTransaksiControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Name = "ProdukKasirControl";
+            Name = "RiwayatTransaksiControl";
             Size = new Size(1920, 1080);
-            Load += ProdukKasirControl_Load;
             ResumeLayout(false);
-        }
-
-        private void ProdukKasirControl_Load(object sender, EventArgs e)
-        {
-
         }
 
         #endregion
