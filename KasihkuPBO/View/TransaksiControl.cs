@@ -32,7 +32,7 @@ namespace KasihkuPBO.View
         public TransaksiControl()
         {
             InitializeComponent();
-            controller = new TransaksiController("Host=localhost;Username=postgres;Password=Dev@211104;Database=KASIHKU", model);
+            controller = new TransaksiController("Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU", model);
             SetupUI();
         }
 
@@ -42,7 +42,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\Transaksi.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\Transaksi.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
@@ -169,7 +169,7 @@ namespace KasihkuPBO.View
             var boldFont = PdfFontFactory.CreateFont(StandardFonts.COURIER_BOLD);
             var normalFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
 
-            string logoPath = @"C:\Users\User\Downloads\LOGO hitam.png";
+            string logoPath = @"C:\Users\Reza\Downloads\LOGO hitam.png";
             if (File.Exists(logoPath))
             {
                 var img = new iText.Layout.Element.Image(ImageDataFactory.Create(logoPath)).ScaleToFit(100, 100);

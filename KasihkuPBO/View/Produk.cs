@@ -13,21 +13,17 @@ namespace KasihkuPBO.View
     {
         private ProdukController produkController = new ProdukController();
 
-        private Panel panelProduk, panelRekomendasi;
+        private FlowLayoutPanel panelProduk;
         private TextBox txtSearch;
-        private DataGridView dataGridViewProduk;
         private Button btnRekomendasi, btnKeTransaksi;
-
-        private ComboBox comboLokasi, comboTujuan, comboPengalaman, comboWaktu;
-        private CheckBox chkTanaman, chkPot, chkPupuk;
-        private Button btnProsesRekomendasi;
-        private ListBox lstRekomendasi;
-
+        private Label lblTotalItem, lblTotalHarga;
         private Dictionary<int, int> jumlahProduk = new Dictionary<int, int>();
-        private Panel panelGrid;
-        private Control? overlayPanel;
+        private Dictionary<int, int> stokProduk = new Dictionary<int, int>();
 
-        // Event untuk navigasi dan transaksi
+        private decimal? lastHargaMin = null;
+        private decimal? lastHargaMax = null;
+        private string lastKategori = "None";
+
         public event Action NavigasiKeTransaksi;
         public event Action<int, string, decimal> ProdukDitambahkan;
         public event Action<int> ProdukDikurangkan;
@@ -36,13 +32,6 @@ namespace KasihkuPBO.View
         {
             InitializeComponent();
             SetupUI();
-
-            txtSearch.Visible = false;
-            btnRekomendasi.Visible = false;
-            btnKeTransaksi.Visible = false;
-            panelProduk.Visible = false;
-            panelRekomendasi.Visible = false;
-            this.Visible = false;
         }
 
         private void SetupUI()
@@ -50,27 +39,25 @@ namespace KasihkuPBO.View
             this.Dock = DockStyle.Fill;
             this.Controls.Clear();
 
-            panelGrid = new Panel()
+            panelProduk = new FlowLayoutPanel()
             {
-                Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\Produk.png"),
-                BackgroundImageLayout = ImageLayout.Stretch
+                Location = new Point(50, 220),
+                Size = new Size(1300, 550),
+                AutoScroll = true,
+                BackColor = Color.White
             };
-            this.Controls.Add(panelGrid);
+            this.Controls.Add(panelProduk);
 
             txtSearch = new TextBox()
             {
-                PlaceholderText = "Cari nama produk...",
                 Location = new Point(400, 165),
                 Width = 400,
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                Visible = false,
                 BackColor = Color.White,
                 ForeColor = Color.Black
             };
             txtSearch.TextChanged += TxtSearch_TextChanged;
             this.Controls.Add(txtSearch);
-            txtSearch.BringToFront();
 
             btnRekomendasi = new Button()
             {
@@ -80,14 +67,10 @@ namespace KasihkuPBO.View
                 Location = new Point(820, 165),
                 BackColor = Color.Green,
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Padding = new Padding(5, 0, 0, 0),
+                FlatStyle = FlatStyle.Flat
             };
-            btnRekomendasi.Click += BtnRekomendasi_Click_ShowPanel;
+            btnRekomendasi.Click += BtnRekomendasi_Click;
             this.Controls.Add(btnRekomendasi);
-            btnRekomendasi.BringToFront();
 
             btnKeTransaksi = new Button()
             {
@@ -97,192 +80,282 @@ namespace KasihkuPBO.View
                 Location = new Point(960, 165),
                 BackColor = Color.Green,
                 ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Padding = new Padding(5, 0, 0, 0),
+                FlatStyle = FlatStyle.Flat
             };
             btnKeTransaksi.Click += BtnKeTransaksi_Click;
             this.Controls.Add(btnKeTransaksi);
-            btnKeTransaksi.BringToFront();
 
-            panelProduk = new Panel()
+            lblTotalItem = new Label()
             {
-                Location = new Point(400, 220),
-                Size = new Size(1400, 700),
-                AutoScroll = true,
-                Visible = false,
-                BackColor = Color.White
+                Text = "Total Item: 0",
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Location = new Point(50, 780),
+                Size = new Size(200, 30)
             };
+            this.Controls.Add(lblTotalItem);
 
-            dataGridViewProduk = CreateProdukGridView(Point.Empty);
-            panelProduk.Controls.Add(dataGridViewProduk);
-            this.Controls.Add(panelProduk);
-            panelProduk.BringToFront();
-
-            panelRekomendasi = new Panel()
+            lblTotalHarga = new Label()
             {
-                Location = new Point(0, 70),
-                Size = new Size(1400, 700),
-                AutoScroll = true,
-                Visible = false
+                Text = "Total Harga: Rp 0",
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Location = new Point(260, 780),
+                Size = new Size(300, 30)
             };
+            this.Controls.Add(lblTotalHarga);
 
-            // Tambahkan checkbox dan listbox rekomendasi
-            chkTanaman = new CheckBox() { Text = "Tanaman", Location = new Point(50, 20), AutoSize = true };
-            chkPot = new CheckBox() { Text = "Pot", Location = new Point(50, 50), AutoSize = true };
-            chkPupuk = new CheckBox() { Text = "Pupuk", Location = new Point(50, 80), AutoSize = true };
-
-            btnProsesRekomendasi = new Button()
-            {
-                Text = "Tampilkan Rekomendasi",
-                Location = new Point(50, 120),
-                Size = new Size(180, 30)
-            };
-            btnProsesRekomendasi.Click += BtnRekomendasi_Click;
-
-            lstRekomendasi = new ListBox()
-            {
-                Location = new Point(50, 170),
-                Size = new Size(400, 400)
-            };
-
-            panelRekomendasi.Controls.Add(chkTanaman);
-            panelRekomendasi.Controls.Add(chkPot);
-            panelRekomendasi.Controls.Add(chkPupuk);
-            panelRekomendasi.Controls.Add(btnProsesRekomendasi);
-            panelRekomendasi.Controls.Add(lstRekomendasi);
-            this.Controls.Add(panelRekomendasi);
-        }
-
-        private DataGridView CreateProdukGridView(Point location)
-        {
-            var grid = new DataGridView()
-            {
-                Location = location,
-                Size = new Size(1300, 600),
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                AllowUserToAddRows = false,
-                ReadOnly = true,
-                RowTemplate = { Height = 100 },
-                BackgroundColor = Color.White,
-                BorderStyle = BorderStyle.None
-            };
-
-            grid.EnableHeadersVisualStyles = false;
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.LightGray;
-            grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
-            grid.RowHeadersVisible = false;
-            grid.DefaultCellStyle.BackColor = Color.White;
-            grid.DefaultCellStyle.ForeColor = Color.Black;
-
-            grid.Columns.Add("id_produk", "ID");
-            grid.Columns.Add("nama_produk", "Nama Produk");
-            grid.Columns.Add("stok", "Stok");
-            grid.Columns.Add("deskripsi", "Deskripsi");
-
-            var imgCol = new DataGridViewImageColumn
-            {
-                Name = "gambar",
-                HeaderText = "Gambar",
-                ImageLayout = DataGridViewImageCellLayout.Zoom
-            };
-            grid.Columns.Add(imgCol);
-
-            grid.Columns.Add("harga", "Harga");
-            grid.Columns.Add("kategori", "Kategori");
-            grid.Columns.Add("jumlah", "Jumlah");
-
-            grid.Columns.Add(new DataGridViewButtonColumn { Name = "tambah", HeaderText = "Tambah", Text = "+", UseColumnTextForButtonValue = true });
-            grid.Columns.Add(new DataGridViewButtonColumn { Name = "kurang", HeaderText = "Kurang", Text = "-", UseColumnTextForButtonValue = true });
-
-            grid.CellClick += DataGridViewProduk_CellClick;
-
-            return grid;
+            LoadProduk();
         }
 
         private void TxtSearch_TextChanged(object sender, EventArgs e)
         {
-            LoadProduk(txtSearch.Text.Trim());
-        }
-
-        private void LoadProduk(string keyword = "")
-        {
-            dataGridViewProduk.Rows.Clear();
-            var produkList = produkController.CariProduk(keyword);
-
-            foreach (var produk in produkList)
-            {
-                Image img = null;
-                if (produk.Gambar != null)
-                {
-                    using (var ms = new MemoryStream(produk.Gambar))
-                        img = Image.FromStream(ms);
-                }
-
-                dataGridViewProduk.Rows.Add(
-                    produk.Id, produk.Nama, produk.Stok, produk.Deskripsi,
-                    img, produk.Harga.ToString("N0"), produk.Kategori, 0
-                );
-            }
-        }
-
-        private void DataGridViewProduk_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            var grid = sender as DataGridView;
-            if (e.RowIndex < 0 || grid.Rows[e.RowIndex].IsNewRow) return;
-
-            var row = grid.Rows[e.RowIndex];
-            int id = Convert.ToInt32(row.Cells["id_produk"].Value);
-            string nama = row.Cells["nama_produk"].Value.ToString();
-            decimal harga = decimal.Parse(row.Cells["harga"].Value.ToString().Replace(",", ""));
-
-            var jumlahCell = row.Cells["jumlah"];
-
-            if (!jumlahProduk.ContainsKey(id))
-                jumlahProduk[id] = 0;
-
-            if (grid.Columns[e.ColumnIndex].Name == "tambah")
-            {
-                jumlahProduk[id]++;
-                jumlahCell.Value = jumlahProduk[id];
-                ProdukDitambahkan?.Invoke(id, nama, harga);
-            }
-            else if (grid.Columns[e.ColumnIndex].Name == "kurang")
-            {
-                if (jumlahProduk[id] > 0)
-                {
-                    jumlahProduk[id]--;
-                    jumlahCell.Value = jumlahProduk[id];
-                    ProdukDikurangkan?.Invoke(id);
-                }
-            }
-        }
-
-        private void BtnRekomendasi_Click_ShowPanel(object sender, EventArgs e)
-        {
-            panelProduk.Visible = false;
-            panelRekomendasi.Visible = true;
+            LoadProduk(txtSearch.Text.Trim(), lastHargaMin, lastHargaMax, lastKategori);
         }
 
         private void BtnRekomendasi_Click(object sender, EventArgs e)
         {
-            List<string> preferensi = new();
-            if (chkTanaman.Checked) preferensi.Add("tanaman");
-            if (chkPot.Checked) preferensi.Add("pot");
-            if (chkPupuk.Checked) preferensi.Add("pupuk");
-
-            lstRekomendasi.Items.Clear();
-
-            if (preferensi.Count == 0)
+            using (var form = new Form())
             {
-                lstRekomendasi.Items.Add("Pilih minimal satu kategori rekomendasi!");
-                return;
+                form.Text = "Filter Rekomendasi";
+                form.Size = new Size(350, 250);
+                form.FormBorderStyle = FormBorderStyle.FixedDialog;
+                form.StartPosition = FormStartPosition.CenterParent;
+                form.MaximizeBox = false;
+                form.MinimizeBox = false;
+
+                var labelKategori = new Label() { Text = "Kategori", Location = new Point(20, 20), Size = new Size(80, 25) };
+                var cmbKategori = new ComboBox()
+                {
+                    Location = new Point(120, 20),
+                    Width = 180,
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Font = new Font("Segoe UI", 10)
+                };
+                cmbKategori.Items.AddRange(new string[] { "None", "Tanaman", "Pot", "Pupuk" });
+                cmbKategori.SelectedItem = lastKategori ?? "None";
+
+                var labelMin = new Label() { Text = "Harga Min", Location = new Point(20, 60), Size = new Size(80, 25) };
+                var txtMin = new TextBox()
+                {
+                    Location = new Point(120, 60),
+                    Width = 180,
+                    Font = new Font("Segoe UI", 10),
+                    Text = lastHargaMin?.ToString() ?? ""
+                };
+
+                var labelMax = new Label() { Text = "Harga Max", Location = new Point(20, 100), Size = new Size(80, 25) };
+                var txtMax = new TextBox()
+                {
+                    Location = new Point(120, 100),
+                    Width = 180,
+                    Font = new Font("Segoe UI", 10),
+                    Text = lastHargaMax?.ToString() ?? ""
+                };
+
+                var btnOK = new Button()
+                {
+                    Text = "Terapkan",
+                    Location = new Point(120, 150),
+                    Size = new Size(80, 35),
+                    DialogResult = DialogResult.OK
+                };
+
+                var btnReset = new Button()
+                {
+                    Text = "Reset",
+                    Location = new Point(220, 150),
+                    Size = new Size(80, 35),
+                    DialogResult = DialogResult.Retry
+                };
+
+                form.Controls.AddRange(new Control[]
+                {
+            labelKategori, cmbKategori,
+            labelMin, txtMin,
+            labelMax, txtMax,
+            btnOK, btnReset
+                });
+
+                form.AcceptButton = btnOK;
+
+                var result = form.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    lastKategori = cmbKategori.SelectedItem.ToString();
+
+                    lastHargaMin = decimal.TryParse(txtMin.Text.Trim(), out decimal min) ? min : null;
+                    lastHargaMax = decimal.TryParse(txtMax.Text.Trim(), out decimal max) ? max : null;
+
+                    LoadProduk(txtSearch.Text.Trim(), lastHargaMin, lastHargaMax, lastKategori);
+                }
+                else if (result == DialogResult.Retry)
+                {
+                    lastKategori = "None";
+                    lastHargaMin = null;
+                    lastHargaMax = null;
+                    LoadProduk();
+                }
+            }
+        }
+
+        private void LoadProduk(string keyword = "", decimal? hargaMin = null, decimal? hargaMax = null, string kategori = "None")
+        {
+            panelProduk.Controls.Clear();
+            var produkList = produkController.CariProduk(keyword);
+
+            if (kategori != "None")
+                produkList = produkList.Where(p => string.Equals(p.Kategori?.Trim(), kategori.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+            if (hargaMin.HasValue)
+                produkList = produkList.Where(p => p.Harga >= hargaMin.Value).ToList();
+            if (hargaMax.HasValue && hargaMax.Value > 0)
+                produkList = produkList.Where(p => p.Harga <= hargaMax.Value).ToList();
+
+            jumlahProduk.Clear();
+            stokProduk.Clear();
+
+            foreach (var produk in produkList)
+            {
+                var panelItem = new Panel()
+                {
+                    Size = new Size(250, 320),
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Margin = new Padding(10),
+                    BackColor = Color.White
+                };
+
+                var gambar = new PictureBox()
+                {
+                    Size = new Size(200, 150),
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    Location = new Point(25, 10)
+                };
+                if (produk.Gambar != null)
+                {
+                    using var ms = new MemoryStream(produk.Gambar);
+                    gambar.Image = Image.FromStream(ms);
+                }
+                panelItem.Controls.Add(gambar);
+
+                var lblNama = new Label()
+                {
+                    Text = produk.Nama,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Size = new Size(230, 25),
+                    Location = new Point(10, 165)
+                };
+                panelItem.Controls.Add(lblNama);
+
+                var lblHarga = new Label()
+                {
+                    Text = "Rp " + produk.Harga.ToString("N"),
+                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Size = new Size(230, 20),
+                    Location = new Point(10, 190)
+                };
+                panelItem.Controls.Add(lblHarga);
+
+                var lblStok = new Label()
+                {
+                    Text = $"Stok: {produk.Stok}",
+                    Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Size = new Size(230, 20),
+                    Location = new Point(10, 215)
+                };
+                panelItem.Controls.Add(lblStok);
+
+                var btnKurang = new Button()
+                {
+                    Text = "-",
+                    Size = new Size(30, 30),
+                    Location = new Point(40, 250)
+                };
+                var lblJumlah = new Label()
+                {
+                    Text = "0",
+                    Location = new Point(80, 255),
+                    Size = new Size(30, 20),
+                    TextAlign = ContentAlignment.MiddleCenter
+                };
+                var btnTambah = new Button()
+                {
+                    Text = "+",
+                    Size = new Size(30, 30),
+                    Location = new Point(120, 250)
+                };
+
+                var btnDetail = new Button()
+                {
+                    Text = "Detail",
+                    Size = new Size(60, 30),
+                    Location = new Point(160, 250),
+                    BackColor = Color.LightBlue
+                };
+
+                int id = produk.Id;
+                string nama = produk.Nama;
+                decimal harga = produk.Harga;
+                int stok = produk.Stok;
+
+                jumlahProduk[id] = 0;
+                stokProduk[id] = stok;
+
+                btnTambah.Click += (s, e) =>
+                {
+                    if (jumlahProduk[id] < stokProduk[id])
+                    {
+                        jumlahProduk[id]++;
+                        lblJumlah.Text = jumlahProduk[id].ToString();
+                        ProdukDitambahkan?.Invoke(id, nama, harga);
+                        UpdateTotal();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Stok produk tidak mencukupi!", "Stok Habis", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                };
+
+                btnKurang.Click += (s, e) =>
+                {
+                    if (jumlahProduk[id] > 0)
+                    {
+                        jumlahProduk[id]--;
+                        lblJumlah.Text = jumlahProduk[id].ToString();
+                        ProdukDikurangkan?.Invoke(id);
+                        UpdateTotal();
+                    }
+                };
+
+                btnDetail.Click += (s, e) =>
+                {
+                    MessageBox.Show(produk.Deskripsi, "Deskripsi Produk", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                };
+
+                panelItem.Controls.Add(btnKurang);
+                panelItem.Controls.Add(lblJumlah);
+                panelItem.Controls.Add(btnTambah);
+                panelItem.Controls.Add(btnDetail);
+                panelProduk.Controls.Add(panelItem);
             }
 
-            var hasil = produkController.RekomendasiProduk(preferensi);
-            foreach (var nama in hasil)
-                lstRekomendasi.Items.Add(nama);
+            UpdateTotal();
+        }
+
+        private void UpdateTotal()
+        {
+            int totalItem = jumlahProduk.Values.Sum();
+            decimal totalHarga = 0;
+            foreach (var pair in jumlahProduk)
+            {
+                var produk = produkController.CariProduk("").FirstOrDefault(p => p.Id == pair.Key);
+                if (produk != null)
+                    totalHarga += produk.Harga * pair.Value;
+            }
+
+            lblTotalItem.Text = $"Total Item: {totalItem}";
+            lblTotalHarga.Text = $"Total Harga: Rp {totalHarga:N}";
         }
 
         private void BtnKeTransaksi_Click(object sender, EventArgs e)
@@ -290,26 +363,20 @@ namespace KasihkuPBO.View
             NavigasiKeTransaksi?.Invoke();
         }
 
-        public void TampilkanProduk()
-        {
-            this.Visible = true;
-            txtSearch.Visible = true;
-            btnRekomendasi.Visible = true;
-            btnKeTransaksi.Visible = true;
-            panelProduk.Visible = true;
-            panelRekomendasi.Visible = false;
-
-            LoadProduk();
-        }
-
         public void SembunyikanProduk()
         {
             this.Visible = false;
-            txtSearch.Visible = false;
-            btnRekomendasi.Visible = false;
-            btnKeTransaksi.Visible = false;
-            panelProduk.Visible = false;
-            panelRekomendasi.Visible = false;
+        }
+
+        public void TampilkanProduk()
+        {
+            this.Visible = true;
+        }
+
+        // Tambahan: memuat ulang produk setelah transaksi
+        public void ReloadProdukList()
+        {
+            LoadProduk(txtSearch.Text.Trim(), lastHargaMin, lastHargaMax, lastKategori);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using KasihkuPBO.Controller;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -11,19 +12,18 @@ namespace KasihkuPBO.View
         private Button btnKembali;
         private Panel overlayPanel;
         private Panel panelGrid;
+        private DateTimePicker datePickerTanggal;
 
-        // Events for controller
         public event EventHandler RefreshRequested;
-
-        // Existing public interface remains the same
         public event Action KembaliClicked;
+
+        // Menyimpan data sementara agar bisa difilter ulang
+        private List<Tuple<string, string, decimal>> semuaRiwayat = new List<Tuple<string, string, decimal>>();
 
         public RiwayatTransaksiControl()
         {
             InitializeComponent();
             SetupUI();
-
-            // Initialize controller
             new RiwayatTransaksiController(this);
         }
 
@@ -32,16 +32,14 @@ namespace KasihkuPBO.View
             this.Dock = DockStyle.Fill;
             this.BackgroundImageLayout = ImageLayout.Stretch;
 
-            // Panel untuk background tambahan jika diperlukan
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\Riwayat1.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\Riwayat.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
 
-            // Panel semi-transparan untuk konten
             overlayPanel = new Panel()
             {
                 BackColor = Color.FromArgb(180, 255, 255, 255),
@@ -51,7 +49,6 @@ namespace KasihkuPBO.View
             };
             panelGrid.Controls.Add(overlayPanel);
 
-            // Tombol kembali
             btnKembali = new Button()
             {
                 Text = " Kembali",
@@ -68,7 +65,6 @@ namespace KasihkuPBO.View
             btnKembali.Click += BtnKembali_Click;
             panelGrid.Controls.Add(btnKembali);
 
-            // Label judul
             Label lblJudul = new Label()
             {
                 Text = "Riwayat Transaksi",
@@ -79,7 +75,15 @@ namespace KasihkuPBO.View
             };
             panelGrid.Controls.Add(lblJudul);
 
-            // DataGridView
+            datePickerTanggal = new DateTimePicker()
+            {
+                Format = DateTimePickerFormat.Short,
+                Location = new Point(560, 165),
+                Width = 140
+            };
+            datePickerTanggal.ValueChanged += (s, e) => TampilkanDataSesuaiTanggal();
+            panelGrid.Controls.Add(datePickerTanggal);
+
             dataGridViewRiwayat = new DataGridView()
             {
                 Dock = DockStyle.Fill,
@@ -88,7 +92,6 @@ namespace KasihkuPBO.View
                 AllowUserToAddRows = false,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.None,
-                Location = new Point(900, 450)
             };
 
             dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.BackColor = Color.DarkGreen;
@@ -101,7 +104,6 @@ namespace KasihkuPBO.View
 
             overlayPanel.Controls.Add(dataGridViewRiwayat);
 
-            // Trigger initial load
             this.Load += (s, e) => RefreshRequested?.Invoke(this, EventArgs.Empty);
         }
 
@@ -110,7 +112,6 @@ namespace KasihkuPBO.View
             KembaliClicked?.Invoke();
         }
 
-        // Public methods remain unchanged
         public void Tampilkan()
         {
             this.Visible = true;
@@ -119,17 +120,41 @@ namespace KasihkuPBO.View
 
         public void TambahRiwayat(string tanggal, string daftarProduk, decimal total)
         {
-            dataGridViewRiwayat.Rows.Add(tanggal, daftarProduk, $"Rp {total:N0}");
+            // Simpan semua riwayat ke list agar bisa difilter ulang
+            semuaRiwayat.Add(new Tuple<string, string, decimal>(tanggal, daftarProduk, total));
+
+            // Hanya tampilkan jika tanggal sesuai yang dipilih
+            string selectedDate = datePickerTanggal.Value.ToString("yyyy-MM-dd");
+            if (tanggal.StartsWith(selectedDate))
+            {
+                dataGridViewRiwayat.Rows.Add(tanggal, daftarProduk, $"Rp {total:N0}");
+            }
         }
 
         public void ResetRiwayat()
         {
             dataGridViewRiwayat.Rows.Clear();
+            semuaRiwayat.Clear();
         }
 
         public void RefreshData()
         {
+            ResetRiwayat();
             RefreshRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void TampilkanDataSesuaiTanggal()
+        {
+            dataGridViewRiwayat.Rows.Clear();
+            string selectedDate = datePickerTanggal.Value.ToString("yyyy-MM-dd");
+
+            foreach (var item in semuaRiwayat)
+            {
+                if (item.Item1.StartsWith(selectedDate))
+                {
+                    dataGridViewRiwayat.Rows.Add(item.Item1, item.Item2, $"Rp {item.Item3:N0}");
+                }
+            }
         }
 
         public void TampilkanError(string message)

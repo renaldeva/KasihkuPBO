@@ -9,6 +9,7 @@ namespace KasihkuPBO
     {
         private Panel panelContent;
         private Label lblWelcome;
+        private RiwayatAdminControl riwayatControl;
 
         // Tombol sudah kamu buat di designer, hanya referensi ulang di sini:
         private Button btnProduk, btnTransaksi, btnRiwayat, btnManajemen, btnLogout;
@@ -37,7 +38,22 @@ namespace KasihkuPBO
                 BackColor = Color.WhiteSmoke
             };
             this.Controls.Add(panelContent);
+
+            riwayatControl = new RiwayatAdminControl();
+            riwayatControl.Dock = DockStyle.Fill;
+            this.Controls.Add(riwayatControl);
+
+            panelContent.Visible = false;
+            riwayatControl.Visible = false;
+
+            riwayatControl.KembaliClicked += () =>
+            {
+                // Event tombol kembali riwayat supaya sembunyikan semua user control
+                panelContent.Visible = false;
+                riwayatControl.Visible = false;
+            };
         }
+
 
         private void TampilkanKontrol(ProdukAdminControl produkControl)
         {
@@ -66,7 +82,16 @@ namespace KasihkuPBO
             panelContent.Controls.Add(produkControl);
 
             panelContent.Visible = true;
+            riwayatControl.Visible = false;
             panelContent.BringToFront();
+        }
+
+        private void ShowRiwayatControl()
+        {
+            panelContent.Visible = false;
+            riwayatControl.Visible = true;
+
+            riwayatControl.BringToFront();
         }
 
         private void ToggleMainUI(bool visible)
@@ -98,7 +123,7 @@ namespace KasihkuPBO
 
         private void btnAdminRiwayat_Click(object sender, EventArgs e)
         {
-            // Tampilkan kontrol riwayat jika ada
+            ShowRiwayatControl();
         }
 
         private void button1_Click(object sender, EventArgs e)
