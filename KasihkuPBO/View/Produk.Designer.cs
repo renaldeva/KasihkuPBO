@@ -29,12 +29,17 @@ namespace KasihkuPBO.View
         /// </summary>
         private void InitializeComponent()
         {
+            btnTransaksiKasir = new Button();
+            btnRiwayatKasir = new Button();
+            btnDashboard = new Button();
             SuspendLayout();
-            // 
             // ProdukKasirControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btnDashboard);
+            Controls.Add(btnRiwayatKasir);
+            Controls.Add(btnTransaksiKasir);
             Name = "ProdukKasirControl";
             Size = new Size(1920, 1080);
             Load += ProdukKasirControl_Load;
@@ -47,5 +52,9 @@ namespace KasihkuPBO.View
         }
 
         #endregion
+
+        private Button btnTransaksiKasir;
+        private Button btnRiwayatKasir;
+        private Button btnDashboard;
     }
 }

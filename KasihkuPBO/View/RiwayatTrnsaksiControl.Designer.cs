@@ -36,9 +36,14 @@
             AutoScaleMode = AutoScaleMode.Font;
             Name = "RiwayatTransaksiControl";
             Size = new Size(1920, 1080);
+            Load += RiwayatTransaksiControl_Load;
             ResumeLayout(false);
         }
 
         #endregion
+
+        private Button btnTransaksiKasir;
+        private Button btnProdukKasir;
+        private Button btnDashboard;
     }
 }

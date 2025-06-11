@@ -1,5 +1,4 @@
-﻿
-namespace KasihkuPBO.View
+﻿namespace KasihkuPBO.View
 {
     partial class ProdukAdminControl
     {
@@ -35,17 +34,9 @@ namespace KasihkuPBO.View
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackgroundImageLayout = ImageLayout.Stretch;
-            Margin = new Padding(0);
             Name = "ProdukAdminControl";
             Size = new Size(1920, 1080);
-            Load += ProdukAdminControl_Load;
             ResumeLayout(false);
-        }
-
-        private void ProdukAdminControl_Load(object sender, EventArgs e)
-        {
-           
         }
 
         #endregion

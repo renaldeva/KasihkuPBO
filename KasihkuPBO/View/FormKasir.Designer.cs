@@ -68,7 +68,7 @@
             btnRiwayatKasir.BackColor = Color.Transparent;
             btnRiwayatKasir.FlatStyle = FlatStyle.Popup;
             btnRiwayatKasir.ForeColor = Color.Transparent;
-            btnRiwayatKasir.Location = new Point(12, 424);
+            btnRiwayatKasir.Location = new Point(12, 434);
             btnRiwayatKasir.Name = "btnRiwayatKasir";
             btnRiwayatKasir.Size = new Size(372, 73);
             btnRiwayatKasir.TabIndex = 5;

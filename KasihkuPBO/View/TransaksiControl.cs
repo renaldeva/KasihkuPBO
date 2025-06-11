@@ -1,73 +1,93 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
-using Npgsql;
+using KasihkuPBO.Model;
+using KasihkuPBO.Controller;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.IO.Image;
+using iText.Kernel.Font;
+using iText.IO.Font.Constants;
+using iText.Layout.Properties;
+using Image = System.Drawing.Image;
+using HorizontalAlignment = iText.Layout.Properties.HorizontalAlignment;
 
 namespace KasihkuPBO.View
 {
     public partial class TransaksiControl : UserControl
     {
-        public RiwayatTransaksiControl RiwayatPanel { get; set; }
+        private TransaksiModel model = new();
+        private TransaksiController controller;
 
         private DataGridView dataGridViewTransaksi;
-        private Button btnBayar;
-        private Button btnKembali;
+        private Button btnBayar, btnKembali;
         private Label lblTotal;
+        private Panel panelGrid;
+
         public event Action KembaliClicked;
-
-        private decimal total = 0;
-        private Dictionary<int, (string nama, decimal harga, int jumlah)> keranjang = new();
-
-        private string connectionString = "Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
-        private readonly object idTransaksi;
+        public RiwayatTransaksiControl RiwayatPanel { get; set; }
 
         public TransaksiControl()
         {
             InitializeComponent();
+            controller = new TransaksiController("Host=localhost;Username=postgres;Password=Dev@211104;Database=KASIHKU", model);
             SetupUI();
         }
 
         private void SetupUI()
         {
             this.Dock = DockStyle.Fill;
-            this.Controls.Clear();
+            panelGrid = new Panel()
+            {
+                Dock = DockStyle.Fill,
+                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\Transaksi.png"),
+                BackgroundImageLayout = ImageLayout.Stretch
+            };
+            this.Controls.Add(panelGrid);
 
             dataGridViewTransaksi = new DataGridView()
             {
-                Location = new Point(30, 20),
                 Size = new Size(800, 400),
+                Location = new Point(400, 165),
+                BackColor = Color.Green,
+                ForeColor = Color.Green,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 ReadOnly = true,
                 AllowUserToAddRows = false
             };
-
             dataGridViewTransaksi.Columns.Add("id_produk", "ID Produk");
             dataGridViewTransaksi.Columns.Add("nama", "Nama Produk");
             dataGridViewTransaksi.Columns.Add("qty", "Qty");
             dataGridViewTransaksi.Columns.Add("harga", "Harga Satuan");
             dataGridViewTransaksi.Columns.Add("subtotal", "Subtotal");
-
             this.Controls.Add(dataGridViewTransaksi);
+            dataGridViewTransaksi.BringToFront();
 
             lblTotal = new Label()
             {
-                Location = new Point(30, 430),
+                Location = new Point(400, 565),
                 Font = new Font("Segoe UI", 14),
                 Size = new Size(400, 40),
-                Text = "Total Bayar: Rp 0"
+                Text = "Total Bayar: Rp 0",
+                BackColor = Color.White
             };
             this.Controls.Add(lblTotal);
+            lblTotal.BringToFront();
 
             btnBayar = new Button()
             {
-                Text = "Konfirmasi Pembayaran",
-                Location = new Point(650, 430),
-                Size = new Size(180, 40)
+                Text = " Konfirmasi Pembayaran ",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Size = new Size(250, 40),
+                Location = new Point(950, 570),
+                BackColor = Color.Green,
+                ForeColor = Color.White
             };
             btnBayar.Click += BtnBayar_Click;
             this.Controls.Add(btnBayar);
+            btnBayar.BringToFront();
 
             btnKembali = new Button()
             {
@@ -75,56 +95,8 @@ namespace KasihkuPBO.View
                 Location = new Point(450, 430),
                 Size = new Size(180, 40)
             };
-            btnKembali.Click += BtnKembali_Click;
+            btnKembali.Click += (s, e) => { this.Visible = false; KembaliClicked?.Invoke(); };
             this.Controls.Add(btnKembali);
-        }
-
-        public void TambahProduk(int id, string nama, decimal harga)
-        {
-            if (keranjang.ContainsKey(id))
-            {
-                var item = keranjang[id];
-                keranjang[id] = (item.nama, item.harga, item.jumlah + 1);
-            }
-            else
-            {
-                keranjang[id] = (nama, harga, 1);
-            }
-            RenderKeranjang();
-        }
-
-        public void KurangiProduk(int id)
-        {
-            if (keranjang.ContainsKey(id))
-            {
-                var item = keranjang[id];
-                int jumlahBaru = item.jumlah - 1;
-                if (jumlahBaru <= 0)
-                    keranjang.Remove(id);
-                else
-                    keranjang[id] = (item.nama, item.harga, jumlahBaru);
-
-                RenderKeranjang();
-            }
-        }
-
-        private void RenderKeranjang()
-        {
-            dataGridViewTransaksi.Rows.Clear();
-            total = 0;
-            foreach (var item in keranjang)
-            {
-                decimal subtotal = item.Value.harga * item.Value.jumlah;
-                dataGridViewTransaksi.Rows.Add(
-                    item.Key,
-                    item.Value.nama,
-                    item.Value.jumlah.ToString(),
-                    item.Value.harga.ToString("N0"),
-                    subtotal.ToString("N0")
-                );
-                total += subtotal;
-            }
-            lblTotal.Text = $"Total Bayar: Rp {total:N0}";
         }
 
         public void Tampilkan()
@@ -133,102 +105,101 @@ namespace KasihkuPBO.View
             this.BringToFront();
         }
 
-        private void BtnBayar_Click(object sender, EventArgs e)
+        public void TambahProduk(int id, string nama, decimal harga)
         {
-            if (keranjang.Count == 0)
-            {
-                MessageBox.Show("Keranjang kosong!", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            string tanggal = DateTime.Now.ToString("yyyy-MM-dd");
-            string daftarProduk = "";
-
-            using (var conn = new NpgsqlConnection(connectionString))
-            {
-                conn.Open();
-                using (var trans = conn.BeginTransaction())
-                {
-                    try
-                    {
-
-                        int idTransaksi;
-
-                        using (var cmd = new NpgsqlCommand("INSERT INTO transaksi (tanggal, total) VALUES (@tanggal, @total) RETURNING id_transaksi", conn))
-                        {
-                            cmd.Parameters.AddWithValue("@tanggal", DateTime.Now);
-                            cmd.Parameters.AddWithValue("@total", total);
-                            cmd.Transaction = trans; // ← penting!
-
-                            idTransaksi = Convert.ToInt32(cmd.ExecuteScalar());
-                        }
-
-                        foreach (var item in keranjang)
-                        {
-                            // Simpan detail transaksi
-                            string insertDetail = @"
-                            INSERT INTO detail_transaksi 
-                            (id_transaksi, id_produk, nama_produk, jumlah, harga, subtotal)
-                            VALUES 
-                            (@id_transaksi, @id_produk, @nama_produk, @jumlah, @harga, @subtotal)";
-
-                            using (var cmdDetail = new NpgsqlCommand(insertDetail, conn))
-                            {
-                                cmdDetail.Parameters.AddWithValue("@id_transaksi", idTransaksi);
-                                cmdDetail.Parameters.AddWithValue("@id_produk", item.Key);
-                                cmdDetail.Parameters.AddWithValue("@nama_produk", item.Value.nama);
-                                cmdDetail.Parameters.AddWithValue("@jumlah", item.Value.jumlah);
-                                cmdDetail.Parameters.AddWithValue("@harga", item.Value.harga);
-                                cmdDetail.Parameters.AddWithValue("@subtotal", item.Value.harga * item.Value.jumlah);
-                                cmdDetail.Transaction = trans;
-
-                                cmdDetail.ExecuteNonQuery();
-                            }
-
-                            // Update stok produk
-                            string updateStok = "UPDATE produk SET stok = stok - @jumlah WHERE id_produk = @id_produk";
-                            using (var cmdUpdate = new NpgsqlCommand(updateStok, conn))
-                            {
-                                cmdUpdate.Parameters.AddWithValue("@jumlah", item.Value.jumlah);
-                                cmdUpdate.Parameters.AddWithValue("@id_produk", item.Key);
-                                cmdUpdate.Transaction = trans;
-
-                                cmdUpdate.ExecuteNonQuery();
-                            }
-
-                            daftarProduk += $"{item.Value.nama} x{item.Value.jumlah}, ";
-                        }
-
-                        trans.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.Rollback();
-                        MessageBox.Show("Gagal menyimpan transaksi: " + ex.Message);
-                        return;
-                    }
-                }
-            }
-
-            daftarProduk = daftarProduk.TrimEnd(',', ' ');
-            RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, total);
-            MessageBox.Show("Transaksi berhasil disimpan!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            keranjang.Clear();
+            model.TambahProduk(id, nama, harga);
             RenderKeranjang();
         }
 
-
-        private void BtnKembali_Click(object sender, EventArgs e)
+        public void KurangiProduk(int id)
         {
-            this.Visible = false;
-            KembaliClicked?.Invoke();
+            model.KurangiProduk(id);
+            RenderKeranjang();
         }
 
         public void ResetKeranjang()
         {
-            keranjang.Clear();
+            model.Reset();
             RenderKeranjang();
+        }
+
+        private void RenderKeranjang()
+        {
+            dataGridViewTransaksi.Rows.Clear();
+            foreach (var item in model.Keranjang)
+            {
+                decimal subtotal = item.Value.harga * item.Value.jumlah;
+                dataGridViewTransaksi.Rows.Add(item.Key, item.Value.nama, item.Value.jumlah, item.Value.harga.ToString("N0"), subtotal.ToString("N0"));
+            }
+            lblTotal.Text = $"Total Bayar: Rp {model.Total:N0}";
+        }
+
+        private void BtnBayar_Click(object sender, EventArgs e)
+        {
+            if (model.Keranjang.Count == 0)
+            {
+                MessageBox.Show("Keranjang kosong!");
+                return;
+            }
+
+            try
+            {
+                int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk);
+                RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total);
+                CetakNotaPdf(idTransaksi, tanggal, daftarProduk, model.Total);
+                MessageBox.Show("Transaksi berhasil!");
+                ResetKeranjang();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal menyimpan transaksi: " + ex.Message);
+            }
+        }
+
+        private void CetakNotaPdf(int idTransaksi, string tanggal, string daftarProduk, decimal total)
+        {
+            string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NotaKasihku");
+            Directory.CreateDirectory(folderPath);
+            string filePath = Path.Combine(folderPath, $"Nota_Transaksi_{idTransaksi}.pdf");
+
+            using var writer = new PdfWriter(filePath);
+            using var pdf = new PdfDocument(writer);
+            var doc = new Document(pdf);
+
+            var boldFont = PdfFontFactory.CreateFont(StandardFonts.COURIER_BOLD);
+            var normalFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
+
+            string logoPath = @"C:\Users\User\Downloads\LOGO hitam.png";
+            if (File.Exists(logoPath))
+            {
+                var img = new iText.Layout.Element.Image(ImageDataFactory.Create(logoPath)).ScaleToFit(100, 100);
+                img.SetHorizontalAlignment(HorizontalAlignment.CENTER);
+                doc.Add(img);
+            }
+
+            doc.Add(new Paragraph("TOKO KASIHKU").SetFont(boldFont).SetTextAlignment(TextAlignment.CENTER));
+            doc.Add(new Paragraph("Jl. Mawar No. 123, Banyuwangi").SetTextAlignment(TextAlignment.CENTER).SetFontSize(10));
+            doc.Add(new Paragraph("========================================================================"));
+            doc.Add(new Paragraph($"ID Transaksi : {idTransaksi}"));
+            doc.Add(new Paragraph($"Tanggal      : {tanggal}"));
+            doc.Add(new Paragraph());
+            doc.Add(new Paragraph("QTY  ITEM                SUBTOTAL").SetFont(boldFont));
+
+            foreach (var item in model.Keranjang)
+            {
+                var (nama, harga, jumlah) = item.Value;
+                string namaPendek = nama.Length > 16 ? nama.Substring(0, 16) : nama;
+                string line = $"{jumlah.ToString().PadRight(4)} {namaPendek.PadRight(18)} Rp {(harga * jumlah):N0}";
+                doc.Add(new Paragraph(line).SetFont(normalFont).SetFontSize(10));
+            }
+
+            doc.Add(new Paragraph("------------------------------------------------------------------------"));
+            doc.Add(new Paragraph($"TOTAL BAYAR:     Rp {total:N0}").SetFont(boldFont).SetFontSize(11));
+            doc.Add(new Paragraph("========================================================================"));
+            doc.Add(new Paragraph("Terima kasih telah berbelanja!").SetTextAlignment(TextAlignment.CENTER));
+            doc.Add(new Paragraph("Toko Kasihku - 2025").SetTextAlignment(TextAlignment.CENTER).SetFontSize(8));
+
+            System.Diagnostics.Process.Start("explorer", filePath);
         }
     }
 }

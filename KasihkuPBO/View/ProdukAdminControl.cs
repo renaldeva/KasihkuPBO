@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.IO;
@@ -7,10 +8,9 @@ using Npgsql;
 
 namespace KasihkuPBO.View
 {
-    public partial class ProdukAdminControl : UserControl
+    public partial class ProdukAdminControl: UserControl
     {
-
-        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
+        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=Dev@211104;Database=KASIHKU";
 
         private Panel panelGrid;
         private Panel panelFormInput;
@@ -53,11 +53,11 @@ namespace KasihkuPBO.View
         {
             // Panel Grid
             panelGrid = new Panel() { Dock = DockStyle.Fill };
-            panelGrid.BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\MJ.png");
+            panelGrid.BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\MJ.png");
             panelGrid.BackgroundImageLayout = ImageLayout.Stretch;
             this.Controls.Add(panelGrid);
 
-            btnTambahProduk = new Button() { Text = "Tambah", Location = new Point(1550, 825), Size = new Size(200,100), BackColor = Color.FromArgb(33, 88, 64), ForeColor = Color.White, Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0) };
+            btnTambahProduk = new Button() { Text = "Tambah", Location = new Point(1550, 825), Size = new Size(200, 100), BackColor = Color.FromArgb(33, 88, 64), ForeColor = Color.White, Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0) };
             btnTambahProduk.Click += BtnTambahProduk_Click;
             panelGrid.Controls.Add(btnTambahProduk);
 
@@ -68,13 +68,10 @@ namespace KasihkuPBO.View
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 AllowUserToAddRows = false,
                 ReadOnly = true,
-                RowTemplate = { Height = 100 },
-                RowHeadersVisible = false
+                RowTemplate = { Height = 100 }
             };
 
-            dataGridView1.Columns.Add("no", "No");
             dataGridView1.Columns.Add("id_produk", "ID");
-            dataGridView1.Columns["id_produk"].Visible = false;
             dataGridView1.Columns.Add("nama_produk", "Nama Produk");
             dataGridView1.Columns.Add("stok", "Stok");
             dataGridView1.Columns.Add("deskripsi", "Deskripsi");
@@ -115,7 +112,7 @@ namespace KasihkuPBO.View
 
             // Panel Form Input
             panelFormInput = new Panel() { Dock = DockStyle.Fill, Visible = false };
-            panelFormInput.BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\MJ.png");
+            panelFormInput.BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\MJ.png");
             panelFormInput.BackgroundImageLayout = ImageLayout.Stretch;
             this.Controls.Add(panelFormInput);
 
@@ -184,167 +181,90 @@ namespace KasihkuPBO.View
 
         private void BtnPilihGambar_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Image files (*.jpg; *.jpeg; *.png)|*.jpg;*.jpeg;*.png";
+
+            if (dlg.ShowDialog() == DialogResult.OK)
             {
-                pictureBoxGambar.Image = Image.FromFile(openFileDialog1.FileName);
-                gambarBaruDipilih = true;
+                pictureBoxGambar.Image = Image.FromFile(dlg.FileName);
             }
         }
 
-        private bool gambarBaruDipilih = false;
-        private OpenFileDialog openFileDialog1 = new OpenFileDialog();
-
         private void BtnSimpan_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtNama.Text) && isEditMode == false)
+            if (string.IsNullOrWhiteSpace(txtNama.Text))
             {
-                MessageBox.Show("Nama Produk harus diisi.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Nama produk harus diisi!");
+                return;
+            }
+            if (!int.TryParse(txtStok.Text, out int stok))
+            {
+                MessageBox.Show("Stok harus angka!");
+                return;
+            }
+            if (!decimal.TryParse(txtHarga.Text, out decimal harga))
+            {
+                MessageBox.Show("Harga harus angka!");
+                return;
+            }
+            if (cmbKategori.SelectedValue == null)
+            {
+                MessageBox.Show("Kategori harus dipilih!");
+                return;
+            }
+            if (pictureBoxGambar.Image == null)
+            {
+                MessageBox.Show("Gambar harus dipilih!");
                 return;
             }
 
-            try
+            byte[] gambarBytes;
+            using (MemoryStream ms = new MemoryStream())
             {
-                using (var conn = new NpgsqlConnection(connectionString))
+                pictureBoxGambar.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                gambarBytes = ms.ToArray();
+            }
+
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                NpgsqlCommand cmd;
+                if (isEditMode)
                 {
-                    conn.Open();
 
-                    string oldNama = null, oldDeskripsi = null;
-                    int oldStok = 0;
-                    decimal oldHarga = 0;
-                    int oldKategori = 0;
-                    byte[] oldGambar = null;
+                    cmd = new NpgsqlCommand(@"
+                        UPDATE produk SET 
+                        nama_produk=@nama, stok=@stok, deskripsi=@deskripsi, 
+                        gambar=@gambar, harga=@harga, id_kategori=@kategori 
+                        WHERE id_produk=@id", conn);
 
-                    if (isEditMode)
-                    {
-                        var getOldCmd = new NpgsqlCommand("SELECT nama_produk, stok, deskripsi, harga, id_kategori, gambar FROM produk WHERE id_produk=@id", conn);
-                        getOldCmd.Parameters.AddWithValue("id", produkIdEdit);
-                        using (var reader = getOldCmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                oldNama = reader["nama_produk"].ToString();
-                                oldStok = Convert.ToInt32(reader["stok"]);
-                                oldDeskripsi = reader["deskripsi"].ToString();
-                                oldHarga = Convert.ToDecimal(reader["harga"]);
-                                oldKategori = Convert.ToInt32(reader["id_kategori"]);
-                                oldGambar = reader["gambar"] is DBNull ? null : (byte[])reader["gambar"];
-                            }
-                        }
-                    }
+                    cmd.Parameters.AddWithValue("id", produkIdEdit);
+                }
+                else
+                {
+                    cmd = new NpgsqlCommand(@"
+                        INSERT INTO produk (nama_produk, stok, deskripsi, gambar, harga, id_kategori) 
+                        VALUES (@nama, @stok, @deskripsi, @gambar, @harga, @kategori)", conn);
+                }
 
-                    string namaProduk = !string.IsNullOrWhiteSpace(txtNama.Text) ? txtNama.Text : (isEditMode ? oldNama : null);
-                    int stok = 0;
-                    if (!string.IsNullOrWhiteSpace(txtStok.Text))
-                    {
-                        if (!int.TryParse(txtStok.Text, out stok))
-                        {
-                            MessageBox.Show("Stok harus berupa angka yang valid.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
-                        }
-                    }
-                    else if (isEditMode)
-                    {
-                        stok = oldStok;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Stok harus diisi.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
+                cmd.Parameters.AddWithValue("nama", txtNama.Text);
+                cmd.Parameters.AddWithValue("stok", stok);
+                cmd.Parameters.AddWithValue("deskripsi", txtDeskripsi.Text);
+                cmd.Parameters.AddWithValue("gambar", gambarBytes);
+                cmd.Parameters.AddWithValue("harga", harga);
+                cmd.Parameters.AddWithValue("kategori", (int)cmbKategori.SelectedValue);
 
-                    string deskripsi = !string.IsNullOrWhiteSpace(txtDeskripsi.Text) ? txtDeskripsi.Text : (isEditMode ? oldDeskripsi : "");
-
-                    decimal harga = 0;
-                    if (!string.IsNullOrWhiteSpace(txtHarga.Text))
-                    {
-                        if (!decimal.TryParse(txtHarga.Text, out harga))
-                        {
-                            MessageBox.Show("Harga harus berupa angka yang valid.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
-                        }
-                    }
-                    else if (isEditMode)
-                    {
-                        harga = oldHarga;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Harga harus diisi.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    int kategori = cmbKategori.SelectedIndex >= 0 ? (int)cmbKategori.SelectedValue : (isEditMode ? oldKategori : 0);
-                    if (kategori == 0)
-                    {
-                        MessageBox.Show("Kategori harus dipilih.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    byte[]? gambarBytes = null;
-                    if (pictureBoxGambar.Image != null && (!isEditMode || gambarBaruDipilih))
-                    {
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            pictureBoxGambar.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                            gambarBytes = ms.ToArray();
-                        }
-                    }
-                    else if (isEditMode)
-                    {
-                        gambarBytes = oldGambar;
-                    }
-
-                    if (isEditMode)
-                    {
-                        string updateQuery = @"
-                    UPDATE produk SET 
-                        nama_produk=@nama, 
-                        stok=@stok, 
-                        deskripsi=@deskripsi, 
-                        harga=@harga, 
-                        id_kategori=@kategori,
-                        gambar=@gambar
-                    WHERE id_produk=@id";
-
-                        var cmd = new NpgsqlCommand(updateQuery, conn);
-                        cmd.Parameters.AddWithValue("nama", namaProduk);
-                        cmd.Parameters.AddWithValue("stok", stok);
-                        cmd.Parameters.AddWithValue("deskripsi", deskripsi);
-                        cmd.Parameters.AddWithValue("harga", harga);
-                        cmd.Parameters.AddWithValue("kategori", kategori);
-                        cmd.Parameters.AddWithValue("gambar", (object)gambarBytes ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("id", produkIdEdit);
-
-                        cmd.ExecuteNonQuery();
-
-                        MessageBox.Show("Produk berhasil diperbarui!");
-                    }
-                    else
-                    {
-                        var cmd = new NpgsqlCommand(@"
-                    INSERT INTO produk (nama_produk, stok, deskripsi, gambar, harga, id_kategori) 
-                    VALUES (@nama, @stok, @deskripsi, @gambar, @harga, @kategori)", conn);
-
-                        cmd.Parameters.AddWithValue("nama", namaProduk);
-                        cmd.Parameters.AddWithValue("stok", stok);
-                        cmd.Parameters.AddWithValue("deskripsi", deskripsi);
-                        cmd.Parameters.AddWithValue("harga", harga);
-                        cmd.Parameters.AddWithValue("kategori", kategori);
-                        cmd.Parameters.AddWithValue("gambar", (object)gambarBytes ?? DBNull.Value);
-
-                        cmd.ExecuteNonQuery();
-
-                        MessageBox.Show("Produk berhasil ditambahkan!");
-                    }
-
-                    ClearForm();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show(isEditMode ? "Data produk berhasil diupdate" : "Data produk berhasil ditambah");
                     LoadProduk();
                     ShowGridOnly();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error saat menyimpan data: " + ex.Message);
+                }
             }
         }
 
@@ -379,10 +299,9 @@ namespace KasihkuPBO.View
 
                 var reader = cmd.ExecuteReader();
 
-                int no = 1; // Mulai dari 1
                 while (reader.Read())
                 {
-                    int id = reader.GetInt32(0); // Tetap ambil ID asli dari database jika perlu (opsional)
+                    int id = reader.GetInt32(0);
                     string nama = reader.GetString(1);
                     int stok = reader.GetInt32(2);
                     string deskripsi = reader.IsDBNull(3) ? "" : reader.GetString(3);
@@ -391,26 +310,18 @@ namespace KasihkuPBO.View
                     string kategori = reader.GetString(6);
 
                     Image img = null;
-                    if (gambarBytes != null && gambarBytes.Length > 0)
+                    if (gambarBytes != null)
                     {
-                        try
+                        using (MemoryStream ms = new MemoryStream(gambarBytes))
                         {
-                            using (MemoryStream ms = new MemoryStream(gambarBytes))
-                            {
-                                img = Image.FromStream(ms);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("Terjadi kesalahan saat memuat produk: " + ex.Message);
+                            img = Image.FromStream(ms);
                         }
                     }
 
-                    dataGridView1.Rows.Add(no++, id, nama, stok, deskripsi, img, harga.ToString("N0"), kategori, "Edit", "Hapus");
+                    dataGridView1.Rows.Add(id, nama, stok, deskripsi, img, harga.ToString("N0"), kategori);
                 }
             }
         }
-        
 
         private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -418,14 +329,10 @@ namespace KasihkuPBO.View
 
             if (dataGridView1.Columns[e.ColumnIndex].Name == "aksi")
             {
-                var idValue = dataGridView1.Rows[e.RowIndex].Cells["id_produk"].Value;
-                if (idValue == null) return;
-
-                int idProduk = Convert.ToInt32(idValue);
-
+                // Edit mode
+                int idProduk = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["id_produk"].Value);
                 LoadDataToForm(idProduk);
             }
-
             else if (dataGridView1.Columns[e.ColumnIndex].Name == "hapus")
             {
                 int idProduk = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["id_produk"].Value);
@@ -451,14 +358,9 @@ namespace KasihkuPBO.View
                     txtNama.Text = reader["nama_produk"].ToString();
                     txtStok.Text = reader["stok"].ToString();
                     txtDeskripsi.Text = reader["deskripsi"].ToString();
-                    txtHarga.Text = reader["harga"].ToString();
+                    txtHarga.Text = Convert.ToDecimal(reader["harga"]).ToString();
 
                     cmbKategori.SelectedValue = Convert.ToInt32(reader["id_kategori"]);
-
-                    if (cmbKategori.Items.Count > 0)
-                    {
-                        cmbKategori.SelectedValue = Convert.ToInt32(reader["id_kategori"]);
-                    }
 
                     if (!(reader["gambar"] is DBNull))
                     {
@@ -500,15 +402,22 @@ namespace KasihkuPBO.View
 
         private void ClearForm()
         {
-            txtNama.Clear();
-            txtStok.Clear();
-            txtDeskripsi.Clear();
-            txtHarga.Clear();
+            txtNama.Text = "";
+            txtStok.Text = "";
+            txtDeskripsi.Text = "";
+            txtHarga.Text = "";
             cmbKategori.SelectedIndex = -1;
             pictureBoxGambar.Image = null;
-            produkIdEdit = -1;
-            isEditMode = false;
-            gambarBaruDipilih = false;
+        }
+
+        private void btnDashbord_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRiwayattransaksi_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
