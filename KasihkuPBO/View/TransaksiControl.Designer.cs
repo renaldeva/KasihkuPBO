@@ -28,17 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            btnProdukKasir = new Button();
-            btnRiwayatKasir = new Button();
-            btnDashboard = new Button();
             SuspendLayout();
+            // 
             // TransaksiControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(btnDashboard);
-            Controls.Add(btnRiwayatKasir);
-            Controls.Add(btnProdukKasir);
             Name = "TransaksiControl";
             Size = new Size(1920, 1080);
             ResumeLayout(false);

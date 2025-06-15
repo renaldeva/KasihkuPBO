@@ -42,6 +42,22 @@ namespace KasihkuPBO
 
             produkKasirControl.SembunyikanProduk();
 
+            produkKasirControl.KembaliClicked += () =>
+            {
+                // Event tombol kembali riwayat supaya sembunyikan semua user control
+                produkKasirControl.Visible = false;
+                transaksiControl.Visible = false;
+                riwayatControl.Visible = false;
+            };
+
+            transaksiControl.KembaliClicked += () =>
+            {
+                // Event tombol kembali riwayat supaya sembunyikan semua user control
+                produkKasirControl.Visible = false;
+                transaksiControl.Visible = false;
+                riwayatControl.Visible = false;
+            };
+
             // Navigasi internal dari produk ke transaksi
             produkKasirControl.NavigasiKeTransaksi += () =>
             {
@@ -56,6 +72,7 @@ namespace KasihkuPBO
                     transaksiControl.Visible = false;
                     riwayatControl.Visible = false;
             };
+
         }
 
         private void ShowProdukControl()

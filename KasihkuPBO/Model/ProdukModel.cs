@@ -9,7 +9,7 @@ namespace KasihkuPBO.Model
 {
     public class ProdukModel
     {
-        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
+        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=Rafif0205,;Database=project";
 
         public List<Produk> GetProduk(string keyword = "")
         {

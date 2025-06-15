@@ -15,7 +15,7 @@ namespace KasihkuPBO.View
 
         private FlowLayoutPanel panelProduk;
         private TextBox txtSearch;
-        private Button btnRekomendasi, btnKeTransaksi;
+        private Button btnRekomendasi, btnKeTransaksi, btnKembali;
         private Label lblTotalItem, lblTotalHarga;
         private Dictionary<int, int> jumlahProduk = new Dictionary<int, int>();
         private Dictionary<int, int> stokProduk = new Dictionary<int, int>();
@@ -25,6 +25,7 @@ namespace KasihkuPBO.View
         private string lastKategori = "None";
 
         public event Action NavigasiKeTransaksi;
+        public event Action KembaliClicked;
         public event Action<int, string, decimal> ProdukDitambahkan;
         public event Action<int> ProdukDikurangkan;
 
@@ -41,8 +42,8 @@ namespace KasihkuPBO.View
 
             panelProduk = new FlowLayoutPanel()
             {
-                Location = new Point(50, 220),
-                Size = new Size(1300, 550),
+                Location = new Point(454, 271),
+                Size = new Size(1371, 662),
                 AutoScroll = true,
                 BackColor = Color.White
             };
@@ -50,8 +51,9 @@ namespace KasihkuPBO.View
 
             txtSearch = new TextBox()
             {
-                Location = new Point(400, 165),
+                Location = new Point(601, 202),
                 Width = 400,
+                Size = new Size (396, 23),
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 BackColor = Color.White,
                 ForeColor = Color.Black
@@ -63,9 +65,9 @@ namespace KasihkuPBO.View
             {
                 Text = " Rekomendasi ",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Size = new Size(140, 45),
-                Location = new Point(820, 165),
-                BackColor = Color.Green,
+                Size = new Size(188, 33),
+                Location = new Point(1009, 202),
+                BackColor = Color.FromArgb(33, 88, 64),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat
             };
@@ -76,21 +78,38 @@ namespace KasihkuPBO.View
             {
                 Text = " Ke Transaksi ",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Size = new Size(140, 45),
-                Location = new Point(960, 165),
-                BackColor = Color.Green,
+                Size = new Size(188, 33),
+                Location = new Point(1243, 202),
+                BackColor = Color.FromArgb(33, 88, 64),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat
             };
             btnKeTransaksi.Click += BtnKeTransaksi_Click;
             this.Controls.Add(btnKeTransaksi);
 
+            btnKembali = new Button()
+            {
+                Text = " Kembali",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Size = new Size(140, 45),
+                Location = new Point(454, 202),
+                BackColor = Color.FromArgb(33, 88, 64),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                ImageAlign = ContentAlignment.MiddleLeft,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Padding = new Padding(5, 0, 0, 0),
+            };
+            btnKembali.Click += BtnKembali_Click;
+            this.Controls.Add(btnKembali);
+            btnKembali.BringToFront();
+
             lblTotalItem = new Label()
             {
                 Text = "Total Item: 0",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(50, 780),
-                Size = new Size(200, 30)
+                Location = new Point(468, 975),
+                Size = new Size(253, 48)
             };
             this.Controls.Add(lblTotalItem);
 
@@ -98,10 +117,11 @@ namespace KasihkuPBO.View
             {
                 Text = "Total Harga: Rp 0",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(260, 780),
-                Size = new Size(300, 30)
+                Location = new Point(745, 975),
+                Size = new Size(253, 48)
             };
             this.Controls.Add(lblTotalHarga);
+
 
             LoadProduk();
         }
@@ -288,7 +308,7 @@ namespace KasihkuPBO.View
 
                 var btnDetail = new Button()
                 {
-                    Text = "Detail",
+                    Text = "Diskripsi",
                     Size = new Size(60, 30),
                     Location = new Point(160, 250),
                     BackColor = Color.LightBlue
@@ -361,6 +381,11 @@ namespace KasihkuPBO.View
         private void BtnKeTransaksi_Click(object sender, EventArgs e)
         {
             NavigasiKeTransaksi?.Invoke();
+        }
+
+        private void BtnKembali_Click(object sender, EventArgs e)
+        {
+            KembaliClicked?.Invoke();
         }
 
         public void SembunyikanProduk()

@@ -34,6 +34,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackgroundImage = Properties.Resources.ProdukAdminControl;
             Name = "ProdukAdminControl";
             Size = new Size(1920, 1080);
             ResumeLayout(false);

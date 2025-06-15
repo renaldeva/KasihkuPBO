@@ -63,9 +63,16 @@ namespace KasihkuPBO
 
             Button btnKembali = new Button
             {
-                Text = "← Kembali",
-                Location = new Point(10, 10),
-                AutoSize = true
+                Text = "⮌ Kembali", // Ikon panah balik Unicode
+                Location = new Point(413, 180),
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                Size = new Size(265, 53),
+                BackColor = Color.FromArgb(33, 88, 64),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Padding = new Padding(10, 0, 0, 0),
+                Cursor = Cursors.Hand
             };
             btnKembali.Click += (s, e) =>
             {

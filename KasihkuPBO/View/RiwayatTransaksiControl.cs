@@ -35,7 +35,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\Riwayat.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Rafif Ahmad H\Downloads\RiwayatTransaksiControl.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
@@ -43,24 +43,24 @@ namespace KasihkuPBO.View
             overlayPanel = new Panel()
             {
                 BackColor = Color.FromArgb(180, 255, 255, 255),
-                Location = new Point(400, 220),
-                Size = new Size(900, 450),
+                Location = new Point(426, 214),
+                Size = new Size(1438, 747),
                 BorderStyle = BorderStyle.FixedSingle
             };
             panelGrid.Controls.Add(overlayPanel);
 
             btnKembali = new Button()
             {
-                Text = " Kembali",
+                Text = "⮌ Kembali", // Ikon panah balik Unicode
+                Location = new Point(426, 166), // sejajar dengan DatePicker
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Size = new Size(140, 45),
-                Location = new Point(400, 165),
-                BackColor = Color.Green,
+                Size = new Size(180, 45),
+                BackColor = Color.FromArgb(33, 88, 64),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                ImageAlign = ContentAlignment.MiddleLeft,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Padding = new Padding(5, 0, 0, 0),
+                Padding = new Padding(10, 0, 0, 0),
+                Cursor = Cursors.Hand
             };
             btnKembali.Click += BtnKembali_Click;
             panelGrid.Controls.Add(btnKembali);
@@ -69,7 +69,7 @@ namespace KasihkuPBO.View
             {
                 Text = "Riwayat Transaksi",
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                ForeColor = Color.DarkGreen,
+                BackColor = Color.FromArgb(33, 88, 64),
                 Location = new Point(900, 450),
                 AutoSize = true
             };
@@ -78,23 +78,28 @@ namespace KasihkuPBO.View
             datePickerTanggal = new DateTimePicker()
             {
                 Format = DateTimePickerFormat.Short,
-                Location = new Point(560, 165),
-                Width = 140
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Location = new Point(643, 166),  // disesuaikan agar sejajar
+                Size = new Size(180, 45),
+                CalendarFont = new Font("Segoe UI", 10),
+                CalendarForeColor = Color.DarkSlateGray
             };
             datePickerTanggal.ValueChanged += (s, e) => TampilkanDataSesuaiTanggal();
             panelGrid.Controls.Add(datePickerTanggal);
 
             dataGridViewRiwayat = new DataGridView()
             {
-                Dock = DockStyle.Fill,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                Dock = DockStyle.Fill,               
                 ReadOnly = true,
                 AllowUserToAddRows = false,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 BackgroundColor = Color.White,
-                BorderStyle = BorderStyle.None,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 40,
+                RowHeadersVisible = false,
             };
 
-            dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.BackColor = Color.DarkGreen;
+            dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(33, 88, 64);
             dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewRiwayat.EnableHeadersVisualStyles = false;
 

@@ -33,10 +33,33 @@ namespace KasihkuPBO.View
             btnRiwayatKasir = new Button();
             btnDashboard = new Button();
             SuspendLayout();
+            // 
+            // btnTransaksiKasir
+            // 
+            btnTransaksiKasir.Location = new Point(0, 0);
+            btnTransaksiKasir.Name = "btnTransaksiKasir";
+            btnTransaksiKasir.Size = new Size(75, 23);
+            btnTransaksiKasir.TabIndex = 2;
+            // 
+            // btnRiwayatKasir
+            // 
+            btnRiwayatKasir.Location = new Point(0, 0);
+            btnRiwayatKasir.Name = "btnRiwayatKasir";
+            btnRiwayatKasir.Size = new Size(75, 23);
+            btnRiwayatKasir.TabIndex = 1;
+            // 
+            // btnDashboard
+            // 
+            btnDashboard.Location = new Point(0, 0);
+            btnDashboard.Name = "btnDashboard";
+            btnDashboard.Size = new Size(75, 23);
+            btnDashboard.TabIndex = 0;
+            // 
             // ProdukKasirControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackgroundImage = Properties.Resources.Produk;
             Controls.Add(btnDashboard);
             Controls.Add(btnRiwayatKasir);
             Controls.Add(btnTransaksiKasir);

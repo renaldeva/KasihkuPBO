@@ -11,6 +11,7 @@ using iText.IO.Image;
 using iText.Kernel.Font;
 using iText.IO.Font.Constants;
 using iText.Layout.Properties;
+using QRCoder;
 using Image = System.Drawing.Image;
 using HorizontalAlignment = iText.Layout.Properties.HorizontalAlignment;
 
@@ -22,9 +23,13 @@ namespace KasihkuPBO.View
         private TransaksiController controller;
 
         private DataGridView dataGridViewTransaksi;
-        private Button btnBayar, btnKembali;
+        private Button btnBayar, btnKembali, btnCetakNota, btnQRIS;
         private Label lblTotal;
         private Panel panelGrid;
+
+        private int lastIdTransaksi = -1;
+        private string lastTanggal = "", lastDaftarProduk = "";
+        private decimal lastTotal = 0;
 
         public event Action KembaliClicked;
         public RiwayatTransaksiControl RiwayatPanel { get; set; }
@@ -32,7 +37,7 @@ namespace KasihkuPBO.View
         public TransaksiControl()
         {
             InitializeComponent();
-            controller = new TransaksiController("Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU", model);
+            controller = new TransaksiController("Host=localhost;Username=postgres;Password=Rafif0205,;Database=project", model);
             SetupUI();
         }
 
@@ -42,21 +47,27 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\Transaksi.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Rafif Ahmad H\Downloads\Transaksi.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
 
             dataGridViewTransaksi = new DataGridView()
             {
-                Size = new Size(800, 400),
-                Location = new Point(400, 165),
-                BackColor = Color.Green,
+                Size = new Size(1371, 662),
+                Location = new Point(454, 271),
+                BackColor = Color.FromArgb(33, 88, 64),
                 ForeColor = Color.Green,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 ReadOnly = true,
                 AllowUserToAddRows = false
             };
+
+
+            dataGridViewTransaksi.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(33, 88, 64);
+            dataGridViewTransaksi.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridViewTransaksi.EnableHeadersVisualStyles = false;
+
             dataGridViewTransaksi.Columns.Add("id_produk", "ID Produk");
             dataGridViewTransaksi.Columns.Add("nama", "Nama Produk");
             dataGridViewTransaksi.Columns.Add("qty", "Qty");
@@ -67,7 +78,7 @@ namespace KasihkuPBO.View
 
             lblTotal = new Label()
             {
-                Location = new Point(400, 565),
+                Location = new Point(454, 962),
                 Font = new Font("Segoe UI", 14),
                 Size = new Size(400, 40),
                 Text = "Total Bayar: Rp 0",
@@ -80,23 +91,57 @@ namespace KasihkuPBO.View
             {
                 Text = " Konfirmasi Pembayaran ",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Size = new Size(250, 40),
-                Location = new Point(950, 570),
-                BackColor = Color.Green,
+                Size = new Size(220, 40),
+                Location = new Point(1374, 948),
+                BackColor = Color.FromArgb(33, 88, 64),
                 ForeColor = Color.White
             };
             btnBayar.Click += BtnBayar_Click;
             this.Controls.Add(btnBayar);
             btnBayar.BringToFront();
 
+            btnQRIS = new Button()
+            {
+                Text = "Bayar via QRIS",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Size = new Size(220, 40),
+                Location = new Point(1126, 948),
+                BackColor = Color.OrangeRed,
+                ForeColor = Color.White
+            };
+            btnQRIS.Click += BtnQRIS_Click;
+            this.Controls.Add(btnQRIS);
+            btnQRIS.BringToFront();
+
             btnKembali = new Button()
             {
-                Text = "Kembali",
-                Location = new Point(450, 430),
-                Size = new Size(180, 40)
+                Text = " Kembali",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Size = new Size(140, 45),
+                Location = new Point(454, 202),
+                BackColor = Color.FromArgb(33, 88, 64),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                ImageAlign = ContentAlignment.MiddleLeft,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Padding = new Padding(5, 0, 0, 0),
             };
-            btnKembali.Click += (s, e) => { this.Visible = false; KembaliClicked?.Invoke(); };
-            this.Controls.Add(btnKembali);
+            btnKembali.Click += BtnKembali_Click;
+            panelGrid.Controls.Add(btnKembali);
+            btnKembali.BringToFront();
+
+            btnCetakNota = new Button()
+            {
+                Text = "Cetak Nota (PDF)",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Size = new Size(200, 40),
+                Location = new Point(1614, 948),
+                BackColor = Color.DarkBlue,
+                ForeColor = Color.White
+            };
+            btnCetakNota.Click += BtnCetakNota_Click;
+            this.Controls.Add(btnCetakNota);
+            btnCetakNota.BringToFront();
         }
 
         public void Tampilkan()
@@ -146,13 +191,91 @@ namespace KasihkuPBO.View
             {
                 int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk);
                 RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total);
-                CetakNotaPdf(idTransaksi, tanggal, daftarProduk, model.Total);
-                MessageBox.Show("Transaksi berhasil!");
+
+                lastIdTransaksi = idTransaksi;
+                lastTanggal = tanggal;
+                lastDaftarProduk = daftarProduk;
+                lastTotal = model.Total;
+
+                MessageBox.Show("Transaksi berhasil! Anda bisa mencetak nota.");
                 ResetKeranjang();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Gagal menyimpan transaksi: " + ex.Message);
+            }
+        }
+
+        private void BtnCetakNota_Click(object sender, EventArgs e)
+        {
+            if (lastIdTransaksi == -1)
+            {
+                MessageBox.Show("Belum ada transaksi yang bisa dicetak.");
+                return;
+            }
+
+            try
+            {
+                CetakNotaPdf(lastIdTransaksi, lastTanggal, lastDaftarProduk, lastTotal);
+                MessageBox.Show("Nota berhasil dicetak.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal mencetak nota: " + ex.Message);
+            }
+        }
+
+        private void BtnQRIS_Click(object sender, EventArgs e)
+        {
+            if (model.Total == 0)
+            {
+                MessageBox.Show("Total pembayaran masih Rp 0. Silakan tambahkan produk terlebih dahulu.");
+                return;
+            }
+
+            string qrisData = $"PAYMENT|TOKO_KASIHKU|TOTAL|{model.Total}";
+            ShowQRCode(qrisData, model.Total);
+        }
+
+        private void BtnKembali_Click(object sender, EventArgs e)
+        {
+            KembaliClicked?.Invoke();
+        }
+
+        private void ShowQRCode(string data, decimal total)
+        {
+            using (var qrForm = new Form())
+            {
+                qrForm.Text = "Pembayaran via QRIS";
+                qrForm.Size = new Size(400, 500);
+
+                var qrGenerator = new QRCodeGenerator();
+                var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new QRCode(qrCodeData);
+                var qrImage = qrCode.GetGraphic(10);
+
+                var pictureBox = new PictureBox()
+                {
+                    Image = qrImage,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Size = new Size(300, 300),
+                    Location = new Point(40, 30)
+                };
+
+                var label = new Label()
+                {
+                    Text = $"Silakan scan QR untuk membayar\nJumlah: Rp {total:N0}",
+                    Size = new Size(350, 80),
+                    Location = new Point(20, 350),
+                    Font = new Font("Segoe UI", 10),
+                    TextAlign = ContentAlignment.MiddleCenter
+                };
+
+                qrForm.Controls.Add(pictureBox);
+                qrForm.Controls.Add(label);
+
+                qrForm.StartPosition = FormStartPosition.CenterParent;
+                qrForm.ShowDialog();
             }
         }
 
@@ -169,7 +292,7 @@ namespace KasihkuPBO.View
             var boldFont = PdfFontFactory.CreateFont(StandardFonts.COURIER_BOLD);
             var normalFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
 
-            string logoPath = @"C:\Users\Reza\Downloads\LOGO hitam.png";
+            string logoPath = @"C:\Users\User\Downloads\LOGO hitam.png";
             if (File.Exists(logoPath))
             {
                 var img = new iText.Layout.Element.Image(ImageDataFactory.Create(logoPath)).ScaleToFit(100, 100);

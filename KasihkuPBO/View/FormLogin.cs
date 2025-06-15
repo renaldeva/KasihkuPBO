@@ -10,8 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.DataFormats;
-
 
 namespace KasihkuPBO
 {
@@ -23,6 +21,10 @@ namespace KasihkuPBO
         {
             InitializeComponent();
             authController = new AuthController();
+
+            // Tambahkan handler KeyDown untuk menangkap tombol Enter
+            LoginUsername.KeyDown += LoginUsername_KeyDown;
+            LoginPassword.KeyDown += LoginPassword_KeyDown;
         }
 
         private void LoginUsername_TextChanged(object sender, EventArgs e)
@@ -88,6 +90,23 @@ namespace KasihkuPBO
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             LoginPassword.UseSystemPasswordChar = !checkBox1.Checked!;
+        }
+
+        // Fitur tambahan: tekan Enter untuk login
+        private void LoginUsername_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                LoginPassword.Focus(); // Pindah fokus ke password
+            }
+        }
+
+        private void LoginPassword_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                button1.PerformClick(); // Tekan tombol login secara otomatis
+            }
         }
     }
 }

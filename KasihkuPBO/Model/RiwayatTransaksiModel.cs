@@ -12,7 +12,7 @@ namespace KasihkuPBO.Model
 
     public class RiwayatTransaksiModel
     {
-        private const string ConnString = "Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
+        private const string ConnString = "Host=localhost;Username=postgres;Password=Rafif0205,;Database=project";
 
         public List<Transaksi> GetRiwayatTransaksi()
         {

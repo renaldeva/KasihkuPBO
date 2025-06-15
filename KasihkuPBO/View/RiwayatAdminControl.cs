@@ -27,38 +27,74 @@ namespace KasihkuPBO.View
         {
             this.Dock = DockStyle.Fill;
 
+            // Tanggal Picker
             datePicker = new DateTimePicker()
             {
                 Format = DateTimePickerFormat.Short,
-                Font = new Font("Segoe UI", 11),
-                Location = new Point(30, 30),
-                Width = 200
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Location = new Point(643, 166),  // disesuaikan agar sejajar
+                Size = new Size(180, 45),
+                CalendarFont = new Font("Segoe UI", 10),
+                CalendarForeColor = Color.DarkSlateGray
             };
             datePicker.ValueChanged += (s, e) => MuatData(datePicker.Value.ToString("yyyy-MM-dd"));
             Controls.Add(datePicker);
 
+            // Tombol Kembali
             btnKembali = new Button()
             {
-                Text = "Kembali",
-                Location = new Point(250, 30),
-                Width = 100,
-                Height = 30
+                Text = "⮌ Kembali", // Ikon panah balik Unicode
+                Location = new Point(426, 166), // sejajar dengan DatePicker
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Size = new Size(180, 45),
+                BackColor = Color.FromArgb(33, 88, 64),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Padding = new Padding(10, 0, 0, 0),
+                Cursor = Cursors.Hand
             };
+            btnKembali.FlatAppearance.BorderSize = 0;
             btnKembali.Click += (s, e) => KembaliClicked?.Invoke();
             Controls.Add(btnKembali);
 
+
             dataGridViewRiwayat = new DataGridView()
             {
-                Location = new Point(30, 80),
-                Size = new Size(700, 400),
+                Location = new Point(426, 214),
+                Size = new Size(1438, 747),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnHeadersHeight = 40,
+                RowHeadersVisible = false, // Hilangkan kolom kiri
             };
 
+            // Styling Header
+            dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(33, 88, 64);
+            dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+            // Styling Isi Sel
+            dataGridViewRiwayat.DefaultCellStyle.Font = new Font("Segoe UI", 11);
+            dataGridViewRiwayat.DefaultCellStyle.ForeColor = Color.Black;
+            dataGridViewRiwayat.DefaultCellStyle.BackColor = Color.White;
+
+            // Nonaktifkan gaya default Windows
+            dataGridViewRiwayat.EnableHeadersVisualStyles = false;
+
+            // Tambah Kolom
             dataGridViewRiwayat.Columns.Add("tanggal", "Tanggal");
             dataGridViewRiwayat.Columns.Add("produk", "Daftar Produk");
             dataGridViewRiwayat.Columns.Add("total", "Total");
+
+            // Tambah ke form
+            Controls.Add(dataGridViewRiwayat);
+            dataGridViewRiwayat.BringToFront();
+
 
             Controls.Add(dataGridViewRiwayat);
         }

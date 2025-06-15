@@ -97,7 +97,7 @@ namespace KasihkuPBO
             btnAdminRiwayat.BackgroundImageLayout = ImageLayout.Zoom;
             btnAdminRiwayat.FlatStyle = FlatStyle.Popup;
             btnAdminRiwayat.ForeColor = Color.Transparent;
-            btnAdminRiwayat.Location = new Point(12, 423);
+            btnAdminRiwayat.Location = new Point(9, 294);
             btnAdminRiwayat.Name = "btnAdminRiwayat";
             btnAdminRiwayat.Size = new Size(378, 77);
             btnAdminRiwayat.TabIndex = 5;
@@ -111,7 +111,7 @@ namespace KasihkuPBO
             btnAdminManajemen.BackgroundImageLayout = ImageLayout.Zoom;
             btnAdminManajemen.FlatStyle = FlatStyle.Popup;
             btnAdminManajemen.ForeColor = Color.Transparent;
-            btnAdminManajemen.Location = new Point(12, 500);
+            btnAdminManajemen.Location = new Point(9, 371);
             btnAdminManajemen.Name = "btnAdminManajemen";
             btnAdminManajemen.Size = new Size(378, 77);
             btnAdminManajemen.TabIndex = 6;
