@@ -35,7 +35,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\Rafif Ahmad H\Downloads\RiwayatTransaksiControl.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\RiwayatTransaksiControl.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);

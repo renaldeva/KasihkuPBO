@@ -23,6 +23,7 @@ namespace KasihkuPBO.View
         private TransaksiController controller;
 
         private DataGridView dataGridViewTransaksi;
+        private Dictionary<int, (string nama, decimal harga, int jumlah)> lastKeranjang;
         private Button btnBayar, btnKembali, btnCetakNota, btnQRIS;
         private Label lblTotal;
         private Panel panelGrid;
@@ -37,7 +38,7 @@ namespace KasihkuPBO.View
         public TransaksiControl()
         {
             InitializeComponent();
-            controller = new TransaksiController("Host=localhost;Username=postgres;Password=Rafif0205,;Database=project", model);
+            controller = new TransaksiController("Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU", model);
             SetupUI();
         }
 
@@ -47,7 +48,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\Rafif Ahmad H\Downloads\Transaksi.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\Transaksi.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
@@ -161,24 +162,6 @@ namespace KasihkuPBO.View
             model.KurangiProduk(id);
             RenderKeranjang();
         }
-
-        public void ResetKeranjang()
-        {
-            model.Reset();
-            RenderKeranjang();
-        }
-
-        private void RenderKeranjang()
-        {
-            dataGridViewTransaksi.Rows.Clear();
-            foreach (var item in model.Keranjang)
-            {
-                decimal subtotal = item.Value.harga * item.Value.jumlah;
-                dataGridViewTransaksi.Rows.Add(item.Key, item.Value.nama, item.Value.jumlah, item.Value.harga.ToString("N0"), subtotal.ToString("N0"));
-            }
-            lblTotal.Text = $"Total Bayar: Rp {model.Total:N0}";
-        }
-
         private void BtnBayar_Click(object sender, EventArgs e)
         {
             if (model.Keranjang.Count == 0)
@@ -197,6 +180,8 @@ namespace KasihkuPBO.View
                 lastDaftarProduk = daftarProduk;
                 lastTotal = model.Total;
 
+                lastKeranjang = new Dictionary<int, (string, decimal, int)>(model.Keranjang);
+
                 MessageBox.Show("Transaksi berhasil! Anda bisa mencetak nota.");
                 ResetKeranjang();
             }
@@ -204,6 +189,23 @@ namespace KasihkuPBO.View
             {
                 MessageBox.Show("Gagal menyimpan transaksi: " + ex.Message);
             }
+        }
+
+        public void ResetKeranjang()
+        {
+            model.Reset();
+            RenderKeranjang();
+        }
+
+        private void RenderKeranjang()
+        {
+            dataGridViewTransaksi.Rows.Clear();
+            foreach (var item in model.Keranjang)
+            {
+                decimal subtotal = item.Value.harga * item.Value.jumlah;
+                dataGridViewTransaksi.Rows.Add(item.Key, item.Value.nama, item.Value.jumlah, item.Value.harga.ToString("N0"), subtotal.ToString("N0"));
+            }
+            lblTotal.Text = $"Total Bayar: Rp {model.Total:N0}";
         }
 
         private void BtnCetakNota_Click(object sender, EventArgs e)
@@ -219,6 +221,7 @@ namespace KasihkuPBO.View
                 CetakNotaPdf(lastIdTransaksi, lastTanggal, lastDaftarProduk, lastTotal);
                 MessageBox.Show("Nota berhasil dicetak.");
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show("Gagal mencetak nota: " + ex.Message);
@@ -292,7 +295,7 @@ namespace KasihkuPBO.View
             var boldFont = PdfFontFactory.CreateFont(StandardFonts.COURIER_BOLD);
             var normalFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
 
-            string logoPath = @"C:\Users\User\Downloads\LOGO hitam.png";
+            string logoPath = @"C:\Users\Reza\Downloads\LOGO hitam.png";
             if (File.Exists(logoPath))
             {
                 var img = new iText.Layout.Element.Image(ImageDataFactory.Create(logoPath)).ScaleToFit(100, 100);
@@ -308,7 +311,7 @@ namespace KasihkuPBO.View
             doc.Add(new Paragraph());
             doc.Add(new Paragraph("QTY  ITEM                SUBTOTAL").SetFont(boldFont));
 
-            foreach (var item in model.Keranjang)
+            foreach (var item in lastKeranjang)
             {
                 var (nama, harga, jumlah) = item.Value;
                 string namaPendek = nama.Length > 16 ? nama.Substring(0, 16) : nama;
@@ -316,7 +319,7 @@ namespace KasihkuPBO.View
                 doc.Add(new Paragraph(line).SetFont(normalFont).SetFontSize(10));
             }
 
-            doc.Add(new Paragraph("------------------------------------------------------------------------"));
+            doc.Add(new Paragraph("========================================================================"));
             doc.Add(new Paragraph($"TOTAL BAYAR:     Rp {total:N0}").SetFont(boldFont).SetFontSize(11));
             doc.Add(new Paragraph("========================================================================"));
             doc.Add(new Paragraph("Terima kasih telah berbelanja!").SetTextAlignment(TextAlignment.CENTER));

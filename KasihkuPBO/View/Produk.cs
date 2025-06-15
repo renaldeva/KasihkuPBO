@@ -190,10 +190,10 @@ namespace KasihkuPBO.View
 
                 form.Controls.AddRange(new Control[]
                 {
-            labelKategori, cmbKategori,
-            labelMin, txtMin,
-            labelMax, txtMax,
-            btnOK, btnReset
+                labelKategori, cmbKategori,
+                labelMin, txtMin,
+                labelMax, txtMax,
+                btnOK, btnReset
                 });
 
                 form.AcceptButton = btnOK;
@@ -219,7 +219,7 @@ namespace KasihkuPBO.View
             }
         }
 
-        private void LoadProduk(string keyword = "", decimal? hargaMin = null, decimal? hargaMax = null, string kategori = "None")
+        public void LoadProduk(string keyword = "", decimal? hargaMin = null, decimal? hargaMax = null, string kategori = "None")
         {
             panelProduk.Controls.Clear();
             var produkList = produkController.CariProduk(keyword);
@@ -327,8 +327,6 @@ namespace KasihkuPBO.View
 
                 btnTambah.Click += (s, e) =>
                 {
-                    if (!jumlahProduk.ContainsKey(id)) jumlahProduk[id] = 0;
-
                     if (jumlahProduk[id] + 1 <= stokProduk[id])
                     {
                         jumlahProduk[id]++;
@@ -344,8 +342,6 @@ namespace KasihkuPBO.View
 
                 btnKurang.Click += (s, e) =>
                 {
-                    if (!jumlahProduk.ContainsKey(id)) jumlahProduk[id] = 0;
-
                     if (jumlahProduk[id] > 0)
                     {
                         jumlahProduk[id]--;
@@ -372,6 +368,10 @@ namespace KasihkuPBO.View
                 panelItem.Controls.Add(btnTambah);
                 panelItem.Controls.Add(btnDeskripsi);
                 panelProduk.Controls.Add(panelItem);
+
+                if (!jumlahProduk.ContainsKey(id)) jumlahProduk[id] = 0;
+                if (!stokProduk.ContainsKey(id)) stokProduk[id] = produk.Stok;
+
             }
 
 
