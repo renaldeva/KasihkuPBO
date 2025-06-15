@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Windows.Forms;
 using KasihkuPBO.Controller;
 using KasihkuPBO.Model;
@@ -292,6 +293,7 @@ namespace KasihkuPBO.View
                     Size = new Size(30, 30),
                     Location = new Point(40, 250)
                 };
+
                 var lblJumlah = new Label()
                 {
                     Text = "0",
@@ -299,6 +301,7 @@ namespace KasihkuPBO.View
                     Size = new Size(30, 20),
                     TextAlign = ContentAlignment.MiddleCenter
                 };
+
                 var btnTambah = new Button()
                 {
                     Text = "+",
@@ -306,9 +309,9 @@ namespace KasihkuPBO.View
                     Location = new Point(120, 250)
                 };
 
-                var btnDetail = new Button()
+                var btnDeskripsi = new Button()
                 {
-                    Text = "Diskripsi",
+                    Text = "Deskripsi",
                     Size = new Size(60, 30),
                     Location = new Point(160, 250),
                     BackColor = Color.LightBlue
@@ -324,7 +327,9 @@ namespace KasihkuPBO.View
 
                 btnTambah.Click += (s, e) =>
                 {
-                    if (jumlahProduk[id] < stokProduk[id])
+                    if (!jumlahProduk.ContainsKey(id)) jumlahProduk[id] = 0;
+
+                    if (jumlahProduk[id] + 1 <= stokProduk[id])
                     {
                         jumlahProduk[id]++;
                         lblJumlah.Text = jumlahProduk[id].ToString();
@@ -339,6 +344,8 @@ namespace KasihkuPBO.View
 
                 btnKurang.Click += (s, e) =>
                 {
+                    if (!jumlahProduk.ContainsKey(id)) jumlahProduk[id] = 0;
+
                     if (jumlahProduk[id] > 0)
                     {
                         jumlahProduk[id]--;
@@ -346,9 +353,16 @@ namespace KasihkuPBO.View
                         ProdukDikurangkan?.Invoke(id);
                         UpdateTotal();
                     }
+                    else
+                    {
+                        jumlahProduk[id] = 0; 
+                        lblJumlah.Text = "0";
+                        System.Media.SystemSounds.Beep.Play();
+                    }
                 };
 
-                btnDetail.Click += (s, e) =>
+
+                btnDeskripsi.Click += (s, e) =>
                 {
                     MessageBox.Show(produk.Deskripsi, "Deskripsi Produk", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 };
@@ -356,9 +370,10 @@ namespace KasihkuPBO.View
                 panelItem.Controls.Add(btnKurang);
                 panelItem.Controls.Add(lblJumlah);
                 panelItem.Controls.Add(btnTambah);
-                panelItem.Controls.Add(btnDetail);
+                panelItem.Controls.Add(btnDeskripsi);
                 panelProduk.Controls.Add(panelItem);
             }
+
 
             UpdateTotal();
         }
@@ -398,7 +413,6 @@ namespace KasihkuPBO.View
             this.Visible = true;
         }
 
-        // Tambahan: memuat ulang produk setelah transaksi
         public void ReloadProdukList()
         {
             LoadProduk(txtSearch.Text.Trim(), lastHargaMin, lastHargaMax, lastKategori);

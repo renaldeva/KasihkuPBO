@@ -28,6 +28,9 @@ namespace KasihkuPBO.View
         private int produkIdEdit = -1;
         internal Control? PanelGrid;
 
+        private byte[] gambarProdukLama;
+        private bool gambarDiubah = false;
+
         public object KembaliClicked { get; private set; }
 
         public ProdukAdminControl()
@@ -209,12 +212,14 @@ namespace KasihkuPBO.View
 
         private void BtnPilihGambar_Click(object sender, EventArgs e)
         {
+            gambarDiubah = true;
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Filter = "Image files (*.jpg; *.jpeg; *.png)|*.jpg;*.jpeg;*.png";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 pictureBoxGambar.Image = Image.FromFile(dlg.FileName);
+                gambarDiubah = true; // <-- penting!
             }
         }
 
@@ -247,10 +252,36 @@ namespace KasihkuPBO.View
             }
 
             byte[] gambarBytes;
-            using (MemoryStream ms = new MemoryStream())
+
+            // Cek kondisi mode edit dan apakah gambar diubah
+            if (isEditMode)
             {
-                pictureBoxGambar.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                gambarBytes = ms.ToArray();
+                if (gambarDiubah)
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        pictureBoxGambar.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        gambarBytes = ms.ToArray();
+                    }
+                }
+                else
+                {
+                    gambarBytes = gambarProdukLama;
+                }
+            }
+            else
+            {
+                if (pictureBoxGambar.Image == null)
+                {
+                    MessageBox.Show("Gambar harus dipilih!");
+                    return;
+                }
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    pictureBoxGambar.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    gambarBytes = ms.ToArray();
+                }
             }
 
             using (var conn = new NpgsqlConnection(connectionString))
@@ -259,20 +290,19 @@ namespace KasihkuPBO.View
                 NpgsqlCommand cmd;
                 if (isEditMode)
                 {
-
                     cmd = new NpgsqlCommand(@"
-                        UPDATE produk SET 
-                        nama_produk=@nama, stok=@stok, deskripsi=@deskripsi, 
-                        gambar=@gambar, harga=@harga, id_kategori=@kategori 
-                        WHERE id_produk=@id", conn);
+                    UPDATE produk SET 
+                    nama_produk=@nama, stok=@stok, deskripsi=@deskripsi, 
+                    gambar=@gambar, harga=@harga, id_kategori=@kategori 
+                    WHERE id_produk=@id", conn);
 
                     cmd.Parameters.AddWithValue("id", produkIdEdit);
                 }
                 else
                 {
                     cmd = new NpgsqlCommand(@"
-                        INSERT INTO produk (nama_produk, stok, deskripsi, gambar, harga, id_kategori) 
-                        VALUES (@nama, @stok, @deskripsi, @gambar, @harga, @kategori)", conn);
+                    INSERT INTO produk (nama_produk, stok, deskripsi, gambar, harga, id_kategori) 
+                    VALUES (@nama, @stok, @deskripsi, @gambar, @harga, @kategori)", conn);
                 }
 
                 cmd.Parameters.AddWithValue("nama", txtNama.Text);
@@ -294,6 +324,7 @@ namespace KasihkuPBO.View
                     MessageBox.Show("Error saat menyimpan data: " + ex.Message);
                 }
             }
+
         }
 
         private void LoadKategori()
@@ -375,6 +406,7 @@ namespace KasihkuPBO.View
         {
             using (var conn = new NpgsqlConnection(connectionString))
             {
+                gambarDiubah = false;
                 conn.Open();
                 var cmd = new NpgsqlCommand("SELECT * FROM produk WHERE id_produk=@id", conn);
                 cmd.Parameters.AddWithValue("id", idProduk);
@@ -392,8 +424,8 @@ namespace KasihkuPBO.View
 
                     if (!(reader["gambar"] is DBNull))
                     {
-                        byte[] imgBytes = (byte[])reader["gambar"];
-                        using (MemoryStream ms = new MemoryStream(imgBytes))
+                        gambarProdukLama = (byte[])reader["gambar"];
+                        using (MemoryStream ms = new MemoryStream(gambarProdukLama))
                         {
                             pictureBoxGambar.Image = Image.FromStream(ms);
                         }
@@ -401,7 +433,10 @@ namespace KasihkuPBO.View
                     else
                     {
                         pictureBoxGambar.Image = null;
+                        gambarProdukLama = null;
                     }
+
+                    gambarDiubah = false; 
                 }
             }
             btnSimpan.Text = "Update";
