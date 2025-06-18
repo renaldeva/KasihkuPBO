@@ -16,9 +16,9 @@ namespace KasihkuPBO
 
             label1.Text = "Selamat datang di aplikasi Kasihku, " + username;
 
-            // Inisialisasi UserControl
             produkKasirControl = new ProdukKasirControl();
             produkKasirControl.Dock = DockStyle.Fill;
+
             produkKasirControl.ProdukDitambahkan += ProdukDitambahkanHandler;
             produkKasirControl.ProdukDikurangkan += ProdukDikurangkanHandler;
 
@@ -28,14 +28,13 @@ namespace KasihkuPBO
             riwayatControl = new RiwayatTransaksiControl();
             riwayatControl.Dock = DockStyle.Fill;
 
+            transaksiControl.ProdukPanel = produkKasirControl;
             transaksiControl.RiwayatPanel = riwayatControl;
 
-            // Tambahkan langsung ke Form (this.Controls)
             this.Controls.Add(produkKasirControl);
             this.Controls.Add(transaksiControl);
             this.Controls.Add(riwayatControl);
 
-            // Atur visibilitas awal: tampilkan produk saja
             produkKasirControl.Visible = true;
             transaksiControl.Visible = false;
             riwayatControl.Visible = false;
@@ -44,7 +43,6 @@ namespace KasihkuPBO
 
             produkKasirControl.KembaliClicked += () =>
             {
-                // Event tombol kembali riwayat supaya sembunyikan semua user control
                 produkKasirControl.Visible = false;
                 transaksiControl.Visible = false;
                 riwayatControl.Visible = false;
@@ -52,13 +50,11 @@ namespace KasihkuPBO
 
             transaksiControl.KembaliClicked += () =>
             {
-                // Event tombol kembali riwayat supaya sembunyikan semua user control
                 produkKasirControl.Visible = false;
                 transaksiControl.Visible = false;
                 riwayatControl.Visible = false;
             };
 
-            // Navigasi internal dari produk ke transaksi
             produkKasirControl.NavigasiKeTransaksi += () =>
             {
                 produkKasirControl.SembunyikanProduk();
@@ -67,7 +63,6 @@ namespace KasihkuPBO
 
             riwayatControl.KembaliClicked += () =>
             {
-                // Event tombol kembali riwayat supaya sembunyikan semua user control
                     produkKasirControl.Visible = false;
                     transaksiControl.Visible = false;
                     riwayatControl.Visible = false;
@@ -138,17 +133,14 @@ namespace KasihkuPBO
 
         private void button2_Click(object sender, EventArgs e)
         {
-            // Kosong, sesuai kode awal
         }
 
         private void Form3_Load(object sender, EventArgs e)
         {
-            // Kosong, sesuai kode awal
         }
 
         private void label1_Click(object sender, EventArgs e)
         {
-            // Kosong, sesuai kode awal
         }
 
     }

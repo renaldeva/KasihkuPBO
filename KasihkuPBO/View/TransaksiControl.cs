@@ -33,6 +33,7 @@ namespace KasihkuPBO.View
         private decimal lastTotal = 0;
 
         public event Action KembaliClicked;
+        public ProdukKasirControl ProdukPanel { get; set; }
         public RiwayatTransaksiControl RiwayatPanel { get; set; }
 
         public TransaksiControl()
@@ -184,6 +185,12 @@ namespace KasihkuPBO.View
 
                 MessageBox.Show("Transaksi berhasil! Anda bisa mencetak nota.");
                 ResetKeranjang();
+
+                if (ProdukPanel != null)
+                {
+                    ProdukPanel.ReloadProdukList();
+                    ProdukPanel.TampilkanProduk();
+                }
             }
             catch (Exception ex)
             {

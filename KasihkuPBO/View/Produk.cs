@@ -18,6 +18,7 @@ namespace KasihkuPBO.View
         private TextBox txtSearch;
         private Button btnRekomendasi, btnKeTransaksi, btnKembali;
         private Label lblTotalItem, lblTotalHarga;
+
         private Dictionary<int, int> jumlahProduk = new Dictionary<int, int>();
         private Dictionary<int, int> stokProduk = new Dictionary<int, int>();
 
@@ -415,7 +416,10 @@ namespace KasihkuPBO.View
 
         public void ReloadProdukList()
         {
+            jumlahProduk.Clear();
+            stokProduk.Clear();
             LoadProduk(txtSearch.Text.Trim(), lastHargaMin, lastHargaMax, lastKategori);
+            UpdateTotal();
         }
     }
 }
