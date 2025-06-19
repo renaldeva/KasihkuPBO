@@ -219,7 +219,7 @@ namespace KasihkuPBO.View
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 pictureBoxGambar.Image = Image.FromFile(dlg.FileName);
-                gambarDiubah = true; // <-- penting!
+                gambarDiubah = true; 
             }
         }
 
@@ -232,14 +232,26 @@ namespace KasihkuPBO.View
             }
             if (!int.TryParse(txtStok.Text, out int stok))
             {
-                MessageBox.Show("Stok harus angka!");
+                MessageBox.Show("Stok harus berupa angka!");
                 return;
             }
+            if (stok <= 0)
+            {
+                MessageBox.Show("Stok harus lebih dari 0!");
+                return;
+            }
+
             if (!decimal.TryParse(txtHarga.Text, out decimal harga))
             {
-                MessageBox.Show("Harga harus angka!");
+                MessageBox.Show("Harga harus berupa angka!");
                 return;
             }
+            if (harga <= 0)
+            {
+                MessageBox.Show("Harga harus lebih dari 0!");
+                return;
+            }
+
             if (cmbKategori.SelectedValue == null)
             {
                 MessageBox.Show("Kategori harus dipilih!");
@@ -253,7 +265,6 @@ namespace KasihkuPBO.View
 
             byte[] gambarBytes;
 
-            // Cek kondisi mode edit dan apakah gambar diubah
             if (isEditMode)
             {
                 if (gambarDiubah)
@@ -388,7 +399,6 @@ namespace KasihkuPBO.View
 
             if (dataGridView1.Columns[e.ColumnIndex].Name == "edit")
             {
-                // Edit mode
                 int idProduk = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["id_produk"].Value);
                 LoadDataToForm(idProduk);
             }

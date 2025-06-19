@@ -286,7 +286,6 @@ namespace KasihkuPBO.View
                     Size = new Size(230, 20),
                     Location = new Point(10, 215)
                 };
-                panelItem.Controls.Add(lblStok);
 
                 var btnKurang = new Button()
                 {
@@ -295,12 +294,13 @@ namespace KasihkuPBO.View
                     Location = new Point(40, 250)
                 };
 
-                var lblJumlah = new Label()
+                var txtJumlah = new TextBox()
                 {
                     Text = "0",
                     Location = new Point(80, 255),
-                    Size = new Size(30, 20),
-                    TextAlign = ContentAlignment.MiddleCenter
+                    Size = new Size(30, 25),
+                    TextAlign = HorizontalAlignment.Center,
+                    MaxLength = 3
                 };
 
                 var btnTambah = new Button()
@@ -325,13 +325,67 @@ namespace KasihkuPBO.View
 
                 jumlahProduk[id] = 0;
                 stokProduk[id] = stok;
+                int jumlahSebelumnya = jumlahProduk[id];
+
+                txtJumlah.TextChanged += (s, e) =>
+                {
+                    string input = txtJumlah.Text.Trim();
+
+                    if (string.IsNullOrEmpty(input))
+                        return;
+
+                    int jumlahSebelumnya = jumlahProduk[id];
+
+                    if (int.TryParse(input, out int jumlahBaru))
+                    {
+                        if (jumlahBaru < 0)
+                        {
+                            MessageBox.Show("Jumlah tidak boleh negatif!\nMasukkan angka minimal 0.", "Input Minus", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            jumlahProduk[id] = 0;
+                            txtJumlah.Text = "0";
+                        }
+                        else if (jumlahBaru > stokProduk[id])
+                        {
+                            MessageBox.Show("Jumlah melebihi stok tersedia!", "Stok Tidak Cukup", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            jumlahProduk[id] = 0;
+                            txtJumlah.Text = "0";
+                        }
+                        else
+                        {
+                            jumlahProduk[id] = jumlahBaru;
+
+                            int selisih = jumlahBaru - jumlahSebelumnya;
+
+                            if (selisih > 0)
+                            {
+                                for (int i = 0; i < selisih; i++)
+                                    ProdukDitambahkan?.Invoke(id, nama, harga);
+                            }
+                            else if (selisih < 0)
+                            {
+                                for (int i = 0; i < -selisih; i++)
+                                    ProdukDikurangkan?.Invoke(id);
+                            }
+                        }
+
+                        txtJumlah.SelectionStart = txtJumlah.Text.Length;
+                        UpdateTotal();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Masukkan hanya angka!", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        jumlahProduk[id] = 0;
+                        txtJumlah.Text = "0";
+                        txtJumlah.SelectionStart = txtJumlah.Text.Length;
+                    }
+                };
 
                 btnTambah.Click += (s, e) =>
                 {
                     if (jumlahProduk[id] + 1 <= stokProduk[id])
                     {
                         jumlahProduk[id]++;
-                        lblJumlah.Text = jumlahProduk[id].ToString();
+                        txtJumlah.Text = jumlahProduk[id].ToString();
                         ProdukDitambahkan?.Invoke(id, nama, harga);
                         UpdateTotal();
                     }
@@ -346,15 +400,15 @@ namespace KasihkuPBO.View
                     if (jumlahProduk[id] > 0)
                     {
                         jumlahProduk[id]--;
-                        lblJumlah.Text = jumlahProduk[id].ToString();
+                        txtJumlah.Text = jumlahProduk[id].ToString();
                         ProdukDikurangkan?.Invoke(id);
                         UpdateTotal();
                     }
                     else
                     {
-                        jumlahProduk[id] = 0; 
-                        lblJumlah.Text = "0";
-                        System.Media.SystemSounds.Beep.Play();
+                        jumlahProduk[id] = 0;
+                        txtJumlah.Text = "0";
+                        SystemSounds.Beep.Play();
                     }
                 };
 
@@ -365,10 +419,11 @@ namespace KasihkuPBO.View
                 };
 
                 panelItem.Controls.Add(btnKurang);
-                panelItem.Controls.Add(lblJumlah);
+                panelItem.Controls.Add(txtJumlah);
                 panelItem.Controls.Add(btnTambah);
                 panelItem.Controls.Add(btnDeskripsi);
                 panelProduk.Controls.Add(panelItem);
+                panelItem.Controls.Add(lblStok);
 
                 if (!jumlahProduk.ContainsKey(id)) jumlahProduk[id] = 0;
                 if (!stokProduk.ContainsKey(id)) stokProduk[id] = produk.Stok;
