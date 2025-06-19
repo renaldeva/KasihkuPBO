@@ -28,7 +28,8 @@ namespace KasihkuPBO.Controller
 
                 foreach (var transaksi in transaksiList)
                 {
-                    _view.TambahRiwayat(transaksi.Tanggal, transaksi.DaftarProduk, transaksi.Total);
+                    // ✅ Sesuaikan dengan parameter baru: tanggal, daftarProduk, total, status
+                    _view.TambahRiwayat(transaksi.Tanggal, transaksi.DaftarProduk, transaksi.Total, transaksi.Status);
                 }
             }
             catch (Exception ex)

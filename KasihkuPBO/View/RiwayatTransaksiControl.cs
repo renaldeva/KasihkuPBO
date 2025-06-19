@@ -17,8 +17,8 @@ namespace KasihkuPBO.View
         public event EventHandler RefreshRequested;
         public event Action KembaliClicked;
 
-        // Menyimpan data sementara agar bisa difilter ulang
-        private List<Tuple<string, string, decimal>> semuaRiwayat = new List<Tuple<string, string, decimal>>();
+        // 🟢 Tambah field status
+        private List<Tuple<string, string, decimal, string>> semuaRiwayat = new List<Tuple<string, string, decimal, string>>();
 
         public RiwayatTransaksiControl()
         {
@@ -35,7 +35,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\RiwayatTransaksiControl.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\RiwayatTransaksiControl.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
@@ -51,8 +51,8 @@ namespace KasihkuPBO.View
 
             btnKembali = new Button()
             {
-                Text = "⮌ Kembali", // Ikon panah balik Unicode
-                Location = new Point(426, 166), // sejajar dengan DatePicker
+                Text = "⮌ Kembali",
+                Location = new Point(426, 166),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 Size = new Size(180, 45),
                 BackColor = Color.FromArgb(33, 88, 64),
@@ -79,7 +79,7 @@ namespace KasihkuPBO.View
             {
                 Format = DateTimePickerFormat.Short,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Location = new Point(643, 166),  // disesuaikan agar sejajar
+                Location = new Point(643, 166),
                 Size = new Size(180, 45),
                 CalendarFont = new Font("Segoe UI", 10),
                 CalendarForeColor = Color.DarkSlateGray
@@ -89,7 +89,7 @@ namespace KasihkuPBO.View
 
             dataGridViewRiwayat = new DataGridView()
             {
-                Dock = DockStyle.Fill,               
+                Dock = DockStyle.Fill,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
@@ -106,6 +106,7 @@ namespace KasihkuPBO.View
             dataGridViewRiwayat.Columns.Add("tanggal", "Tanggal");
             dataGridViewRiwayat.Columns.Add("produk", "Daftar Produk");
             dataGridViewRiwayat.Columns.Add("total", "Total");
+            dataGridViewRiwayat.Columns.Add("status", "Status"); // 🟢 Tambahkan kolom Status
 
             overlayPanel.Controls.Add(dataGridViewRiwayat);
 
@@ -123,16 +124,15 @@ namespace KasihkuPBO.View
             this.BringToFront();
         }
 
-        public void TambahRiwayat(string tanggal, string daftarProduk, decimal total)
+        // 🟢 Tambahkan parameter status
+        public void TambahRiwayat(string tanggal, string daftarProduk, decimal total, string status)
         {
-            // Simpan semua riwayat ke list agar bisa difilter ulang
-            semuaRiwayat.Add(new Tuple<string, string, decimal>(tanggal, daftarProduk, total));
+            semuaRiwayat.Add(new Tuple<string, string, decimal, string>(tanggal, daftarProduk, total, status));
 
-            // Hanya tampilkan jika tanggal sesuai yang dipilih
             string selectedDate = datePickerTanggal.Value.ToString("yyyy-MM-dd");
             if (tanggal.StartsWith(selectedDate))
             {
-                dataGridViewRiwayat.Rows.Add(tanggal, daftarProduk, $"Rp {total:N0}");
+                dataGridViewRiwayat.Rows.Add(tanggal, daftarProduk, $"Rp {total:N0}", status);
             }
         }
 
@@ -157,7 +157,7 @@ namespace KasihkuPBO.View
             {
                 if (item.Item1.StartsWith(selectedDate))
                 {
-                    dataGridViewRiwayat.Rows.Add(item.Item1, item.Item2, $"Rp {item.Item3:N0}");
+                    dataGridViewRiwayat.Rows.Add(item.Item1, item.Item2, $"Rp {item.Item3:N0}", item.Item4); // 🟢 Tambahkan status
                 }
             }
         }

@@ -16,7 +16,7 @@ namespace KasihkuPBO.Controller
             this.model = model;
         }
 
-        public int SimpanTransaksi(out string tanggal, out string daftarProduk)
+        public int SimpanTransaksi(out string tanggal, out string daftarProduk, string status)
         {
             tanggal = DateTime.Now.ToString("yyyy-MM-dd");
             daftarProduk = "";
@@ -28,10 +28,13 @@ namespace KasihkuPBO.Controller
 
             try
             {
-                using (var cmd = new NpgsqlCommand("INSERT INTO transaksi (tanggal, total) VALUES (@tanggal, @total) RETURNING id_transaksi", conn))
+                // ✅ Tambahkan kolom "status" di INSERT INTO transaksi
+                using (var cmd = new NpgsqlCommand(
+                    "INSERT INTO transaksi (tanggal, total, status) VALUES (@tanggal, @total, @status) RETURNING id_transaksi", conn))
                 {
                     cmd.Parameters.AddWithValue("@tanggal", DateTime.Now);
                     cmd.Parameters.AddWithValue("@total", model.Total);
+                    cmd.Parameters.AddWithValue("@status", status); // 🟢 Tambahan kolom status
                     cmd.Transaction = trans;
                     idTransaksi = Convert.ToInt32(cmd.ExecuteScalar());
                 }
@@ -41,9 +44,9 @@ namespace KasihkuPBO.Controller
                     var (nama, harga, jumlah) = item.Value;
 
                     using (var cmdDetail = new NpgsqlCommand(@"
-                        INSERT INTO detail_transaksi 
-                        (id_transaksi, id_produk, nama_produk, jumlah, harga, subtotal)
-                        VALUES (@id_transaksi, @id_produk, @nama_produk, @jumlah, @harga, @subtotal)", conn))
+                INSERT INTO detail_transaksi 
+                (id_transaksi, id_produk, nama_produk, jumlah, harga, subtotal)
+                VALUES (@id_transaksi, @id_produk, @nama_produk, @jumlah, @harga, @subtotal)", conn))
                     {
                         cmdDetail.Parameters.AddWithValue("@id_transaksi", idTransaksi);
                         cmdDetail.Parameters.AddWithValue("@id_produk", item.Key);
@@ -67,6 +70,10 @@ namespace KasihkuPBO.Controller
                 }
 
                 trans.Commit();
+
+                // Hapus koma dan spasi terakhir jika ada
+                if (daftarProduk.EndsWith(", "))
+                    daftarProduk = daftarProduk[..^2];
             }
             catch
             {
@@ -76,5 +83,6 @@ namespace KasihkuPBO.Controller
 
             return idTransaksi;
         }
+
     }
 }

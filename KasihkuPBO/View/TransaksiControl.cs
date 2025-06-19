@@ -39,7 +39,7 @@ namespace KasihkuPBO.View
         public TransaksiControl()
         {
             InitializeComponent();
-            controller = new TransaksiController("Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU", model);
+            controller = new TransaksiController("Host=localhost;Username=postgres;Password=Dev@211104;Database=KASIHKU", model);
             SetupUI();
         }
 
@@ -49,7 +49,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\Transaksi.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\Transaksi.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
@@ -173,30 +173,27 @@ namespace KasihkuPBO.View
 
             try
             {
-                int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk);
-                RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total);
+                int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk, "Cash"); // ✅ status Cash
+                RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total, "Cash"); // ✅
 
                 lastIdTransaksi = idTransaksi;
                 lastTanggal = tanggal;
                 lastDaftarProduk = daftarProduk;
                 lastTotal = model.Total;
-
                 lastKeranjang = new Dictionary<int, (string, decimal, int)>(model.Keranjang);
 
                 MessageBox.Show("Transaksi berhasil! Anda bisa mencetak nota.");
                 ResetKeranjang();
 
-                if (ProdukPanel != null)
-                {
-                    ProdukPanel.ReloadProdukList();
-                    ProdukPanel.TampilkanProduk();
-                }
+                ProdukPanel?.ReloadProdukList();
+                ProdukPanel?.TampilkanProduk();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Gagal menyimpan transaksi: " + ex.Message);
             }
         }
+
 
         public void ResetKeranjang()
         {
@@ -243,26 +240,17 @@ namespace KasihkuPBO.View
                 return;
             }
 
-            string qrisData = $"PAYMENT|TOKO_KASIHKU|TOTAL|{model.Total}";
-            ShowQRCode(qrisData, model.Total);
+            ShowStaticQRCode(@"C:\Users\User\Downloads\QRIS.png", model.Total); // Ubah path ke lokasi gambar QRIS kamu
         }
 
-        private void BtnKembali_Click(object sender, EventArgs e)
-        {
-            KembaliClicked?.Invoke();
-        }
-
-        private void ShowQRCode(string data, decimal total)
+        private void ShowStaticQRCode(string imagePath, decimal total)
         {
             using (var qrForm = new Form())
             {
                 qrForm.Text = "Pembayaran via QRIS";
-                qrForm.Size = new Size(400, 500);
+                qrForm.Size = new Size(400, 580);
 
-                var qrGenerator = new QRCodeGenerator();
-                var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
-                var qrCode = new QRCode(qrCodeData);
-                var qrImage = qrCode.GetGraphic(10);
+                var qrImage = Image.FromFile(imagePath);
 
                 var pictureBox = new PictureBox()
                 {
@@ -281,13 +269,51 @@ namespace KasihkuPBO.View
                     TextAlign = ContentAlignment.MiddleCenter
                 };
 
+                var btnKonfirmasi = new Button()
+                {
+                    Text = "Konfirmasi Pembayaran QRIS",
+                    Location = new Point(100, 450),
+                    Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                    Size = new Size(200, 30),
+                    BackColor = Color.FromArgb(33, 88, 64),
+                    ForeColor = Color.White
+                };
+
+                btnKonfirmasi.Click += (s, e) =>
+                {
+                    // Anggap transaksi lunas dan statusnya adalah QRIS
+                    int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk, "QRIS");
+                    RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total, "QRIS");
+
+                    lastIdTransaksi = idTransaksi;
+                    lastTanggal = tanggal;
+                    lastDaftarProduk = daftarProduk;
+                    lastTotal = model.Total;
+                    lastKeranjang = new Dictionary<int, (string, decimal, int)>(model.Keranjang);
+
+                    ResetKeranjang();
+                    ProdukPanel?.ReloadProdukList();
+                    ProdukPanel?.TampilkanProduk();
+
+                    MessageBox.Show("Pembayaran QRIS dikonfirmasi!");
+                    qrForm.Close();
+                };
+
                 qrForm.Controls.Add(pictureBox);
                 qrForm.Controls.Add(label);
-
+                qrForm.Controls.Add(btnKonfirmasi);
                 qrForm.StartPosition = FormStartPosition.CenterParent;
                 qrForm.ShowDialog();
             }
         }
+
+
+        private void BtnKembali_Click(object sender, EventArgs e)
+        {
+            KembaliClicked?.Invoke();
+        }
+
+
 
         private void CetakNotaPdf(int idTransaksi, string tanggal, string daftarProduk, decimal total)
         {
@@ -302,7 +328,7 @@ namespace KasihkuPBO.View
             var boldFont = PdfFontFactory.CreateFont(StandardFonts.COURIER_BOLD);
             var normalFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
 
-            string logoPath = @"C:\Users\Reza\Downloads\LOGO hitam.png";
+            string logoPath = @"C:\Users\User\Downloads\LOGO hitam.png";
             if (File.Exists(logoPath))
             {
                 var img = new iText.Layout.Element.Image(ImageDataFactory.Create(logoPath)).ScaleToFit(100, 100);
