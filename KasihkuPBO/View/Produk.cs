@@ -208,6 +208,18 @@ namespace KasihkuPBO.View
                     string minText = txtMin.Text.Trim();
                     string maxText = txtMax.Text.Trim();
 
+                    if (!string.IsNullOrEmpty(minText) && !decimal.TryParse(minText, out _))
+                    {
+                        MessageBox.Show("Harga minimum harus berupa angka!", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    if (!string.IsNullOrEmpty(maxText) && !decimal.TryParse(maxText, out _))
+                    {
+                        MessageBox.Show("Harga maksimum harus berupa angka!", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
                     bool isMinValid = decimal.TryParse(minText, out decimal min);
                     bool isMaxValid = decimal.TryParse(maxText, out decimal max);
 
@@ -223,8 +235,8 @@ namespace KasihkuPBO.View
                         return;
                     }
 
-                    lastHargaMin = (!string.IsNullOrEmpty(minText) && isMinValid) ? min : null;
-                    lastHargaMax = (!string.IsNullOrEmpty(maxText) && isMaxValid) ? max : null;
+                    lastHargaMin = isMinValid ? min : null;
+                    lastHargaMax = isMaxValid ? max : null;
 
                     LoadProduk(txtSearch.Text.Trim(), lastHargaMin, lastHargaMax, lastKategori);
                 }
