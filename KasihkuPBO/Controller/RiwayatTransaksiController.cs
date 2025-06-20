@@ -14,7 +14,6 @@ namespace KasihkuPBO.Controller
             _view = view;
             _model = new RiwayatTransaksiModel();
 
-            // Wire up view events
             _view.Load += (s, e) => LoadData();
             _view.RefreshRequested += (s, e) => LoadData();
         }
@@ -28,7 +27,6 @@ namespace KasihkuPBO.Controller
 
                 foreach (var transaksi in transaksiList)
                 {
-                    // ✅ Sesuaikan dengan parameter baru: tanggal, daftarProduk, total, status
                     _view.TambahRiwayat(transaksi.Tanggal, transaksi.DaftarProduk, transaksi.Total, transaksi.Status);
                 }
             }

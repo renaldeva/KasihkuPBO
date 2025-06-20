@@ -10,7 +10,7 @@ namespace KasihkuPBO.View
 {
     public partial class ProdukAdminControl: UserControl
     {
-        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=Dev@211104;Database=KASIHKU";
+        private string connectionString = "Host=localhost;Port=5432;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
 
         private Panel panelGrid;
         private Panel panelFormInput;
@@ -56,9 +56,8 @@ namespace KasihkuPBO.View
 
         public void SetupUI()
         {
-            // Panel Grid
             panelGrid = new Panel() { Dock = DockStyle.Fill };
-            panelGrid.BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\ManajemenProduk.png");
+            panelGrid.BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\ManajemenProduk.png");
             panelGrid.BackgroundImageLayout = ImageLayout.Stretch;
             this.Controls.Add(panelGrid);
 
@@ -77,32 +76,26 @@ namespace KasihkuPBO.View
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
                 ColumnHeadersHeight = 40,
-                RowHeadersVisible = false // Hilangkan kolom kiri abu-abu
+                RowHeadersVisible = false 
             };
 
-
-            // Styling header
             dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(33, 88, 64);
             dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             dataGridView1.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridView1.EnableHeadersVisualStyles = false;
 
-            // Styling isi baris
             dataGridView1.DefaultCellStyle.Font = new Font("Segoe UI", 11);
             dataGridView1.DefaultCellStyle.BackColor = Color.White;
             dataGridView1.DefaultCellStyle.ForeColor = Color.Black;
 
-            // Tambah kolom
             dataGridView1.Columns.Add("id_produk", "ID");
             dataGridView1.Columns.Add("nama_produk", "Nama Produk");
             dataGridView1.Columns.Add("stok", "Stok");
             dataGridView1.Columns.Add("deskripsi", "Deskripsi");
 
-            // Tambah ke form
             Controls.Add(dataGridView1);
             dataGridView1.BringToFront();
-
 
             var imgCol = new DataGridViewImageColumn
             {
@@ -114,7 +107,6 @@ namespace KasihkuPBO.View
 
             dataGridView1.Columns.Add("harga", "Harga");
             dataGridView1.Columns.Add("kategori", "Kategori");
-
 
             var editCol = new DataGridViewButtonColumn()
             {
@@ -139,14 +131,12 @@ namespace KasihkuPBO.View
             dataGridView1.CellClick += DataGridView1_CellClick;
             panelGrid.Controls.Add(dataGridView1);
 
-            // Panel Form Input
             panelFormInput = new Panel() { Dock = DockStyle.Fill, Visible = false };
-            panelFormInput.BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\ManajemenProduk.png");
+            panelFormInput.BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\ManajemenProduk.png");
             panelFormInput.BackgroundImageLayout = ImageLayout.Stretch;
             this.Controls.Add(panelFormInput);
 
             panelFormInput.Controls.Add(new Label() { Text = "Tambah Dan Edit Produk :", Location = new Point(450, 300), BackColor = Color.Transparent, Size = new Size(900, 100), ForeColor = Color.DarkGreen, Font = new Font("Times New Roman", 36F, FontStyle.Bold, GraphicsUnit.Point, 0) });
-
 
             int labelX = 500, controlX = 800, currentY = 400, jarakY = 35;
 
@@ -206,8 +196,6 @@ namespace KasihkuPBO.View
         private void BtnKembali_Click(object sender, EventArgs e)
         {
             ShowGridOnly();
-            
-
         }
 
         private void BtnPilihGambar_Click(object sender, EventArgs e)

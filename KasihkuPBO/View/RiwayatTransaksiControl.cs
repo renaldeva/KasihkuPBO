@@ -17,7 +17,6 @@ namespace KasihkuPBO.View
         public event EventHandler RefreshRequested;
         public event Action KembaliClicked;
 
-        // 🟢 Tambah field status
         private List<Tuple<string, string, decimal, string>> semuaRiwayat = new List<Tuple<string, string, decimal, string>>();
 
         public RiwayatTransaksiControl()
@@ -35,7 +34,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\RiwayatTransaksiControl.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\RiwayatTransaksiControl.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
@@ -106,7 +105,7 @@ namespace KasihkuPBO.View
             dataGridViewRiwayat.Columns.Add("tanggal", "Tanggal");
             dataGridViewRiwayat.Columns.Add("produk", "Daftar Produk");
             dataGridViewRiwayat.Columns.Add("total", "Total");
-            dataGridViewRiwayat.Columns.Add("status", "Status"); // 🟢 Tambahkan kolom Status
+            dataGridViewRiwayat.Columns.Add("status", "Metode Pembayaran"); 
 
             overlayPanel.Controls.Add(dataGridViewRiwayat);
 
@@ -124,7 +123,6 @@ namespace KasihkuPBO.View
             this.BringToFront();
         }
 
-        // 🟢 Tambahkan parameter status
         public void TambahRiwayat(string tanggal, string daftarProduk, decimal total, string status)
         {
             semuaRiwayat.Add(new Tuple<string, string, decimal, string>(tanggal, daftarProduk, total, status));
@@ -157,7 +155,7 @@ namespace KasihkuPBO.View
             {
                 if (item.Item1.StartsWith(selectedDate))
                 {
-                    dataGridViewRiwayat.Rows.Add(item.Item1, item.Item2, $"Rp {item.Item3:N0}", item.Item4); // 🟢 Tambahkan status
+                    dataGridViewRiwayat.Rows.Add(item.Item1, item.Item2, $"Rp {item.Item3:N0}", item.Item4);
                 }
             }
         }

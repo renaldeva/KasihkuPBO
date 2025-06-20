@@ -20,19 +20,18 @@ namespace KasihkuPBO.View
             InitializeComponent();
             controller = new RiwayatAdminController();
             SetupUI();
-            MuatData(); // tampilkan semua saat awal
+            MuatData();
         }
 
         private void SetupUI()
         {
             this.Dock = DockStyle.Fill;
 
-            // Tanggal Picker
             datePicker = new DateTimePicker()
             {
                 Format = DateTimePickerFormat.Short,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Location = new Point(643, 166),  // disesuaikan agar sejajar
+                Location = new Point(643, 166), 
                 Size = new Size(180, 45),
                 CalendarFont = new Font("Segoe UI", 10),
                 CalendarForeColor = Color.DarkSlateGray
@@ -40,11 +39,10 @@ namespace KasihkuPBO.View
             datePicker.ValueChanged += (s, e) => MuatData(datePicker.Value.ToString("yyyy-MM-dd"));
             Controls.Add(datePicker);
 
-            // Tombol Kembali
             btnKembali = new Button()
             {
-                Text = "⮌ Kembali", // Ikon panah balik Unicode
-                Location = new Point(426, 166), // sejajar dengan DatePicker
+                Text = "⮌ Kembali", 
+                Location = new Point(426, 166), 
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 Size = new Size(180, 45),
                 BackColor = Color.FromArgb(33, 88, 64),
@@ -58,7 +56,6 @@ namespace KasihkuPBO.View
             btnKembali.Click += (s, e) => KembaliClicked?.Invoke();
             Controls.Add(btnKembali);
 
-
             dataGridViewRiwayat = new DataGridView()
             {
                 Location = new Point(426, 214),
@@ -69,34 +66,28 @@ namespace KasihkuPBO.View
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.FixedSingle,
                 ColumnHeadersHeight = 40,
-                RowHeadersVisible = false, // Hilangkan kolom kiri
+                RowHeadersVisible = false
             };
 
-            // Styling Header
             dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(33, 88, 64);
             dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 12, FontStyle.Bold);
             dataGridViewRiwayat.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-            // Styling Isi Sel
             dataGridViewRiwayat.DefaultCellStyle.Font = new Font("Segoe UI", 11);
             dataGridViewRiwayat.DefaultCellStyle.ForeColor = Color.Black;
             dataGridViewRiwayat.DefaultCellStyle.BackColor = Color.White;
 
-            // Nonaktifkan gaya default Windows
             dataGridViewRiwayat.EnableHeadersVisualStyles = false;
 
-            // Tambah Kolom
             dataGridViewRiwayat.Columns.Add("tanggal", "Tanggal");
             dataGridViewRiwayat.Columns.Add("produk", "Daftar Produk");
             dataGridViewRiwayat.Columns.Add("total", "Total");
+            dataGridViewRiwayat.Columns.Add("status", "Metode Pembayaran");
 
-            // Tambah ke form
+            Controls.Add(dataGridViewRiwayat);
             Controls.Add(dataGridViewRiwayat);
             dataGridViewRiwayat.BringToFront();
-
-
-            Controls.Add(dataGridViewRiwayat);
         }
 
         private void MuatData(string filterTanggal = "")
@@ -106,11 +97,10 @@ namespace KasihkuPBO.View
 
             foreach (var item in data)
             {
-                // Cocokkan hanya bagian tanggal (tanpa jam)
                 var tanggalTransaksi = item.Tanggal.Split(' ')[0];
                 if (string.IsNullOrEmpty(filterTanggal) || tanggalTransaksi == filterTanggal)
                 {
-                    dataGridViewRiwayat.Rows.Add(item.Tanggal, item.DaftarProduk, $"Rp {item.Total:N0}");
+                    dataGridViewRiwayat.Rows.Add(item.Tanggal, item.DaftarProduk, $"Rp {item.Total:N0}", item.Status);
                 }
             }
         }

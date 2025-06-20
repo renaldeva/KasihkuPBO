@@ -22,7 +22,6 @@ namespace KasihkuPBO
             InitializeComponent();
             authController = new AuthController();
 
-            // Tambahkan handler KeyDown untuk menangkap tombol Enter
             LoginUsername.KeyDown += LoginUsername_KeyDown;
             LoginPassword.KeyDown += LoginPassword_KeyDown;
         }
@@ -92,12 +91,11 @@ namespace KasihkuPBO
             LoginPassword.UseSystemPasswordChar = !checkBox1.Checked!;
         }
 
-        // Fitur tambahan: tekan Enter untuk login
         private void LoginUsername_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                LoginPassword.Focus(); // Pindah fokus ke password
+                LoginPassword.Focus();
             }
         }
 
@@ -105,7 +103,7 @@ namespace KasihkuPBO
         {
             if (e.KeyCode == Keys.Enter)
             {
-                button1.PerformClick(); // Tekan tombol login secara otomatis
+                button1.PerformClick(); 
             }
         }
     }

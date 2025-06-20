@@ -13,7 +13,7 @@ namespace KasihkuPBO.Model
 
     public class RiwayatTransaksiModel
     {
-        private const string ConnString = "Host=localhost;Username=postgres;Password=Dev@211104;Database=KASIHKU";
+        private const string ConnString = "Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU";
 
         public List<Transaksi> GetRiwayatTransaksi()
         {
@@ -42,7 +42,7 @@ namespace KasihkuPBO.Model
                             Tanggal = reader.GetDateTime(0).ToString("yyyy-MM-dd HH:mm"),
                             DaftarProduk = reader.GetString(1),
                             Total = reader.GetDecimal(2),
-                            Status = reader.GetString(3) // 🟢 Ambil status dari kolom ke-4
+                            Status = reader.GetString(3) 
                         });
                     }
                 }

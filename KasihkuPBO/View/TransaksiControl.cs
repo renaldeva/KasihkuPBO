@@ -28,6 +28,7 @@ namespace KasihkuPBO.View
         private Label lblTotal;
         private Panel panelGrid;
 
+        private bool sudahCetakNota = false;
         private int lastIdTransaksi = -1;
         private string lastTanggal = "", lastDaftarProduk = "";
         private decimal lastTotal = 0;
@@ -39,7 +40,7 @@ namespace KasihkuPBO.View
         public TransaksiControl()
         {
             InitializeComponent();
-            controller = new TransaksiController("Host=localhost;Username=postgres;Password=Dev@211104;Database=KASIHKU", model);
+            controller = new TransaksiController("Host=localhost;Username=postgres;Password=fahrezaadam1784;Database=KASIHKU", model);
             SetupUI();
         }
 
@@ -49,7 +50,7 @@ namespace KasihkuPBO.View
             panelGrid = new Panel()
             {
                 Dock = DockStyle.Fill,
-                BackgroundImage = Image.FromFile(@"C:\Users\User\Downloads\Transaksi.png"),
+                BackgroundImage = Image.FromFile(@"C:\Users\Reza\Downloads\Transaksi.png"),
                 BackgroundImageLayout = ImageLayout.Stretch
             };
             this.Controls.Add(panelGrid);
@@ -173,14 +174,15 @@ namespace KasihkuPBO.View
 
             try
             {
-                int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk, "Cash"); // ✅ status Cash
-                RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total, "Cash"); // ✅
+                int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk, "Cash"); 
+                RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total, "Cash"); 
 
                 lastIdTransaksi = idTransaksi;
                 lastTanggal = tanggal;
                 lastDaftarProduk = daftarProduk;
                 lastTotal = model.Total;
                 lastKeranjang = new Dictionary<int, (string, decimal, int)>(model.Keranjang);
+                sudahCetakNota = false;
 
                 MessageBox.Show("Transaksi berhasil! Anda bisa mencetak nota.");
                 ResetKeranjang();
@@ -193,7 +195,6 @@ namespace KasihkuPBO.View
                 MessageBox.Show("Gagal menyimpan transaksi: " + ex.Message);
             }
         }
-
 
         public void ResetKeranjang()
         {
@@ -220,12 +221,18 @@ namespace KasihkuPBO.View
                 return;
             }
 
+            if (sudahCetakNota)
+            {
+                MessageBox.Show("Nota sudah dicetak. Tidak bisa mencetak dua kali.");
+                return;
+            }
+
             try
             {
                 CetakNotaPdf(lastIdTransaksi, lastTanggal, lastDaftarProduk, lastTotal);
+                sudahCetakNota = true;
                 MessageBox.Show("Nota berhasil dicetak.");
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show("Gagal mencetak nota: " + ex.Message);
@@ -240,7 +247,7 @@ namespace KasihkuPBO.View
                 return;
             }
 
-            ShowStaticQRCode(@"C:\Users\User\Downloads\QRIS.png", model.Total); // Ubah path ke lokasi gambar QRIS kamu
+            ShowStaticQRCode(@"C:\Users\Reza\Downloads\QRIS.png", model.Total);
         }
 
         private void ShowStaticQRCode(string imagePath, decimal total)
@@ -281,7 +288,6 @@ namespace KasihkuPBO.View
 
                 btnKonfirmasi.Click += (s, e) =>
                 {
-                    // Anggap transaksi lunas dan statusnya adalah QRIS
                     int idTransaksi = controller.SimpanTransaksi(out string tanggal, out string daftarProduk, "QRIS");
                     RiwayatPanel?.TambahRiwayat(tanggal, daftarProduk, model.Total, "QRIS");
 
@@ -307,13 +313,10 @@ namespace KasihkuPBO.View
             }
         }
 
-
         private void BtnKembali_Click(object sender, EventArgs e)
         {
             KembaliClicked?.Invoke();
         }
-
-
 
         private void CetakNotaPdf(int idTransaksi, string tanggal, string daftarProduk, decimal total)
         {
@@ -328,7 +331,7 @@ namespace KasihkuPBO.View
             var boldFont = PdfFontFactory.CreateFont(StandardFonts.COURIER_BOLD);
             var normalFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
 
-            string logoPath = @"C:\Users\User\Downloads\LOGO hitam.png";
+            string logoPath = @"C:\Users\Reza\Downloads\LOGO hitam.png";
             if (File.Exists(logoPath))
             {
                 var img = new iText.Layout.Element.Image(ImageDataFactory.Create(logoPath)).ScaleToFit(100, 100);

@@ -11,14 +11,12 @@ namespace KasihkuPBO
         private Label lblWelcome;
         private RiwayatAdminControl riwayatControl;
 
-        // Tombol sudah kamu buat di designer, hanya referensi ulang di sini:
         private Button btnProduk, btnTransaksi, btnRiwayat, btnManajemen, btnLogout;
 
         public FormAdmin(string username)
         {
             InitializeComponent();
 
-            // Ambil referensi tombol dan label dari designer (misal nama control di designer):
             lblWelcome = label1;
             btnProduk = btnAdminProduk;
             btnTransaksi = btnAdminTransaksi;
@@ -28,7 +26,6 @@ namespace KasihkuPBO
 
             lblWelcome.Text = "Selamat datang di aplikasi Kasihku, " + username;
 
-            // Inisialisasi panelContent untuk menampung UserControl dinamis
             panelContent = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -48,7 +45,6 @@ namespace KasihkuPBO
 
             riwayatControl.KembaliClicked += () =>
             {
-                // Event tombol kembali riwayat supaya sembunyikan semua user control
                 panelContent.Visible = false;
                 riwayatControl.Visible = false;
             };
@@ -63,7 +59,7 @@ namespace KasihkuPBO
 
             Button btnKembali = new Button
             {
-                Text = "⮌ Kembali", // Ikon panah balik Unicode
+                Text = "⮌ Kembali", 
                 Location = new Point(413, 180),
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 Size = new Size(265, 53),
@@ -81,10 +77,8 @@ namespace KasihkuPBO
             };
             panelContent.Controls.Add(btnKembali);
 
-            // Pastikan produkControl hanya tampilkan panel grid saja
             produkControl.ShowGridOnly();
 
-            // Tambahkan seluruh ProdukAdminControl ke panelContent
             produkControl.Dock = DockStyle.Fill;
             panelContent.Controls.Add(produkControl);
 
@@ -111,7 +105,6 @@ namespace KasihkuPBO
             btnLogout.Visible = visible;
         }
 
-        // Event handler tombol - contohnya
         private void btnAdminManajemen_Click(object sender, EventArgs e)
         {
             TampilkanKontrol(new ProdukAdminControl());
@@ -119,13 +112,11 @@ namespace KasihkuPBO
 
         private void btnAdminProduk_Click(object sender, EventArgs e)
         {
-            // Contoh bila ingin pakai ProdukAdminControl juga, bisa dipanggil seperti ini:
             TampilkanKontrol(new ProdukAdminControl());
         }
 
         private void btnAdminTransaksi_Click(object sender, EventArgs e)
         {
-            // Tampilkan kontrol transaksi jika ada
         }
 
         private void btnAdminRiwayat_Click(object sender, EventArgs e)

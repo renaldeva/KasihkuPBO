@@ -205,11 +205,30 @@ namespace KasihkuPBO.View
                 {
                     lastKategori = cmbKategori.SelectedItem.ToString();
 
-                    lastHargaMin = decimal.TryParse(txtMin.Text.Trim(), out decimal min) ? min : null;
-                    lastHargaMax = decimal.TryParse(txtMax.Text.Trim(), out decimal max) ? max : null;
+                    string minText = txtMin.Text.Trim();
+                    string maxText = txtMax.Text.Trim();
+
+                    bool isMinValid = decimal.TryParse(minText, out decimal min);
+                    bool isMaxValid = decimal.TryParse(maxText, out decimal max);
+
+                    if (isMinValid && min < 0)
+                    {
+                        MessageBox.Show("Harga minimum tidak boleh kurang dari 0.", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    if (isMaxValid && max < 0)
+                    {
+                        MessageBox.Show("Harga maksimum tidak boleh kurang dari 0.", "Input Tidak Valid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    lastHargaMin = (!string.IsNullOrEmpty(minText) && isMinValid) ? min : null;
+                    lastHargaMax = (!string.IsNullOrEmpty(maxText) && isMaxValid) ? max : null;
 
                     LoadProduk(txtSearch.Text.Trim(), lastHargaMin, lastHargaMax, lastKategori);
                 }
+
                 else if (result == DialogResult.Retry)
                 {
                     lastKategori = "None";

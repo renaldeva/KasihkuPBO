@@ -28,13 +28,12 @@ namespace KasihkuPBO.Controller
 
             try
             {
-                // ✅ Tambahkan kolom "status" di INSERT INTO transaksi
                 using (var cmd = new NpgsqlCommand(
                     "INSERT INTO transaksi (tanggal, total, status) VALUES (@tanggal, @total, @status) RETURNING id_transaksi", conn))
                 {
                     cmd.Parameters.AddWithValue("@tanggal", DateTime.Now);
                     cmd.Parameters.AddWithValue("@total", model.Total);
-                    cmd.Parameters.AddWithValue("@status", status); // 🟢 Tambahan kolom status
+                    cmd.Parameters.AddWithValue("@status", status); 
                     cmd.Transaction = trans;
                     idTransaksi = Convert.ToInt32(cmd.ExecuteScalar());
                 }
@@ -71,7 +70,6 @@ namespace KasihkuPBO.Controller
 
                 trans.Commit();
 
-                // Hapus koma dan spasi terakhir jika ada
                 if (daftarProduk.EndsWith(", "))
                     daftarProduk = daftarProduk[..^2];
             }
